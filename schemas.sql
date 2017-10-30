@@ -14,7 +14,7 @@ DROP TABLE groupMembership CASCADE CONSTRAINTS;
 DROP TABLE pendingGroupmembers CASCADE CONSTRAINTS;
 
 CREATE TABLE profile(
-	userID varchar2(20),
+	userID varchar2(20) not null,
 	name varchar2(50),
 	password varchar2(50),
 	date_of_birth date,
@@ -23,9 +23,9 @@ CREATE TABLE profile(
 );
 
 CREATE TABLE friends(
-	userID1 varchar2(20),
-	userID2 varchar2(20),
-	JDate date,
+	userID1 varchar2(20) not null,
+	userID2 varchar2(20) not null,
+	JDate date not null,
 	message varchar2(200),
 	CONSTRAINT friends_pk PRIMARY KEY(userID1, userID2, JDate),
 	CONSTRAINT friends_fk1 FOREIGN KEY (userID1) REFERENCES profile(userID),
@@ -33,8 +33,8 @@ CREATE TABLE friends(
 );
 
 CREATE TABLE pendingFriends(
-	fromID varchar2(20),
-	toID varchar2(20),
+	fromID varchar2(20) not null,
+	toID varchar2(20) not null,
 	message varchar2(200),
 	CONSTRAINT pendingFriends_pk PRIMARY KEY (fromID, toID),
 	CONSTRAINT pendingFriends_FK1 FOREIGN KEY (fromID) REFERENCES profile(userID),
@@ -42,7 +42,7 @@ CREATE TABLE pendingFriends(
 );
 
 CREATE TABLE messages(
-	msgID varchar2(20),
+	msgID varchar2(20) not null,
 	fromID varchar2(20),
 	message varchar2(200),
 	toUserID varchar2(20),
@@ -50,9 +50,10 @@ CREATE TABLE messages(
 	dateSend date,
 	CONSTRAINT messages_pk PRIMARY KEY (msgID),
 	CONSTRAINT messages_fk1 FOREIGN KEY (toUserID) REFERENCES profile(userID),
-	CONSTRAINT messages_fk2 FOREIGN KEY (toGroupID) REFERENCES groups(gID)
-);
+	CONSTRAINT messages_fk2 FOREIGN KEY (toGroupID) REFERENCES groups(gID));
 
+ALTER TABLE messages modify toGroupID default null;
+ALTER TABLE messages modify toUserID default null;
 
 CREATE TABLE messageRecipient(
 	msgID			varchar2(20),
