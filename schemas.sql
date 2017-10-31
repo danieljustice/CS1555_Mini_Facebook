@@ -56,24 +56,24 @@ ALTER TABLE messages modify toGroupID default null;
 ALTER TABLE messages modify toUserID default null;
 
 CREATE TABLE messageRecipient(
-	msgID			varchar2(20),
-	userID			varchar2(20),
+	msgID			varchar2(20) not null,
+	userID			varchar2(20) not null,
 	CONSTRAINT messageRecipient_pk PRIMARY KEY (msgID, useID),
 	CONSTRAINT messageRecipient_fk1 FOREIGN KEY (msgID) REFERENCES messages(msgID),
 	CONSTRAINT messageRecipient_fk2 FOREIGN KEY (userID) REFERENCES profile(userID)
 );
 
 CREATE TABLE groups(
-	gID				varchar2(20),
+	gID				varchar2(20) not null,
 	name			varchar2(50),
 	description		varchar2(200),
 	CONSTRAINT groups_ID PRIMARY KEY (gID)
 );
 
 CREATE TABLE groupMembership(
-	gID				varchar2(20),
+	gID				varchar2(20) not null,
 	--user that is a part of the group
-	userID			varchar2(20),
+	userID			varchar2(20) not null,
 	--roles are manager or member
 	role			varchar2(20),
 	--primary key is a combo of the group ID and a user in that group
@@ -83,9 +83,9 @@ CREATE TABLE groupMembership(
 );
 
 CREATE TABLE pendingGroupmembers(
-	gID				varchar2(20),
+	gID				varchar2(20) not null,
 	--user who wants to joing the group
-	userID			varchar2(20),
+	userID			varchar2(20) not null,
 	message 		varchar2(200),
 	--primary key is a combo of the group to be joined and the user that wants to join
 	CONSTRAINT pendingGroupmembers_pk PRIMARY KEY (gID, userID),
