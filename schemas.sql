@@ -41,6 +41,13 @@ CREATE TABLE pendingFriends(
 	CONSTRAINT pendingFriends_FK2 FOREIGN KEY (toID) REFERENCES profile(userID)
 );
 
+CREATE TABLE groups(
+	gID				varchar2(20) not null,
+	name			varchar2(50),
+	description		varchar2(200),
+	CONSTRAINT groups_ID PRIMARY KEY (gID)
+);
+
 CREATE TABLE messages(
 	msgID varchar2(20) not null,
 	fromID varchar2(20),
@@ -58,16 +65,9 @@ ALTER TABLE messages modify toUserID default null;
 CREATE TABLE messageRecipient(
 	msgID			varchar2(20) not null,
 	userID			varchar2(20) not null,
-	CONSTRAINT messageRecipient_pk PRIMARY KEY (msgID, useID),
+	CONSTRAINT messageRecipient_pk PRIMARY KEY (msgID, userID),
 	CONSTRAINT messageRecipient_fk1 FOREIGN KEY (msgID) REFERENCES messages(msgID),
 	CONSTRAINT messageRecipient_fk2 FOREIGN KEY (userID) REFERENCES profile(userID)
-);
-
-CREATE TABLE groups(
-	gID				varchar2(20) not null,
-	name			varchar2(50),
-	description		varchar2(200),
-	CONSTRAINT groups_ID PRIMARY KEY (gID)
 );
 
 CREATE TABLE groupMembership(
@@ -78,8 +78,8 @@ CREATE TABLE groupMembership(
 	role			varchar2(20),
 	--primary key is a combo of the group ID and a user in that group
 	CONSTRAINT groupMembership_pk PRIMARY KEY (gID, userID),
-	CONSTRAINT groupMembership_fk1 FOREIGN KEY gID REFERENCES groups(gID),
-	CONSTRAINT groupMembership_fk2 FOREIGN KEY userID REFERENCES profile(userID)
+	CONSTRAINT groupMembership_fk1 FOREIGN KEY (gID) REFERENCES groups(gID),
+	CONSTRAINT groupMembership_fk2 FOREIGN KEY (userID) REFERENCES profile(userID)
 );
 
 CREATE TABLE pendingGroupmembers(
@@ -89,6 +89,8 @@ CREATE TABLE pendingGroupmembers(
 	message 		varchar2(200),
 	--primary key is a combo of the group to be joined and the user that wants to join
 	CONSTRAINT pendingGroupmembers_pk PRIMARY KEY (gID, userID),
-	CONSTRAINT pendingGroupmembers_fk1 FOREIGN KEY gID REFERENCES groups(gID),
-	CONSTRAINT pendingGroupmembers_fk2 FOREIGN KEY userID REFERENCES profile(userID)
+	CONSTRAINT pendingGroupmembers_fk1 FOREIGN KEY (gID) REFERENCES groups(gID),
+	CONSTRAINT pendingGroupmembers_fk2 FOREIGN KEY (userID) REFERENCES profile(userID)
 );
+
+commit;

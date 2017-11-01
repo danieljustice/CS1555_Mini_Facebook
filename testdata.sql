@@ -176,3 +176,5 @@ INSERT INTO friends values('a1', 'a2', null, null);
 --280
 --290
 --300
+
+commit;
