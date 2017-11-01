@@ -114,3 +114,65 @@ INSERT INTO profiles values('a98', 'Brenda', '1', null, null);
 INSERT INTO profiles values('a99', 'Bailey', '1', null, null);
 INSERT INTO profiles values('a100', 'Beth', '1', null, null);
 --100
+
+--Add 200 friendships
+--0
+INSERT INTO friends values('a1', 'a2', null, null);
+--10
+--20
+--30
+--40
+--50
+--60
+--70
+--80
+--90
+--100
+--110
+--120
+--130
+--140
+--150
+--160
+--170
+--180
+--190
+--200
+
+
+--Add 10 groups
+
+--Add at least 5 users to each group
+
+--Add 300 messages
+--0
+--10
+--20
+--30
+--40
+--50
+--60
+--70
+--80
+--90
+--100
+--110
+--120
+--130
+--140
+--150
+--160
+--170
+--180
+--190
+--200
+--210
+--220
+--230
+--240
+--250
+--260
+--270
+--280
+--290
+--300
