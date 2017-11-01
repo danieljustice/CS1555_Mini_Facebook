@@ -43,3 +43,27 @@ BEGIN
 	WHERE :new.userID = userID;
 END;
 /
+
+CREATE OR REPLACE TRIGGER CASCADE_MESSAGE_DELETION
+AFTER
+DELETE ON messages
+FOR EACH ROW
+BEGIN
+	DELETE FROM messageRecipient
+	WHERE msgID = :old.msgID;
+END;
+/
+
+CREATE OR REPLACE TRIGGER CASCADE_GROUP_DELETION
+AFTER
+DELETE ON groups
+FOR EACH ROW
+BEGIN
+	DELETE FROM groupMembership
+	WHERE gID = :old.gID;
+	DELETE FROM pendingGroupmembers
+	WHERE gID = :old.gID;
+	DELETE FROM messages
+	WHERE toGroupID = :old.gID;
+END;
+/
