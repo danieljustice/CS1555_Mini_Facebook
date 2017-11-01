@@ -33,3 +33,13 @@ BEGIN
 		WHERE fromID = :old.userID or toUserID = :old.userID;
 END;
 /
+
+CREATE OR REPLACE TRIGGER MEMBERS_CANT_BE_PENDING
+AFTER
+INSERT ON groupMembership
+FOR EACH ROW
+BEGIN
+	DELETE FROM pendingGroupmembers
+	WHERE :new.userID = userID;
+END;
+/
