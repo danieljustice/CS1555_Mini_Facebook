@@ -1,0 +1,1 @@
+--Create friendships for the database
