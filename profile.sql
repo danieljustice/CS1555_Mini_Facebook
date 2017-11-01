@@ -1,3 +1,6 @@
+--Insert profile data
+
+
 insert into profile (userID, name, password, date_of_birth, lastlogin) values (1, 'Vanessa', 'V8dmmbo2H3eK', '1954-10-05 23:12:15', '2017-03-10 11:32:18');
 insert into profile (userID, name, password, date_of_birth, lastlogin) values (2, 'Chrissy', 'HvB8YMWJuN', '1989-03-11 08:42:37', '2017-01-23 23:24:46');
 insert into profile (userID, name, password, date_of_birth, lastlogin) values (3, 'Trumann', 'dCJ2qYla', '1966-06-07 11:57:34', '2017-09-05 19:33:14');
@@ -98,3 +101,5 @@ insert into profile (userID, name, password, date_of_birth, lastlogin) values (9
 insert into profile (userID, name, password, date_of_birth, lastlogin) values (98, 'Shelly', 'ZMv66I', '1977-01-13 16:31:49', '2016-12-29 22:45:20');
 insert into profile (userID, name, password, date_of_birth, lastlogin) values (99, 'Roberta', 'UBXrKyVq', '1991-08-28 16:43:25', '2016-12-13 05:06:15');
 insert into profile (userID, name, password, date_of_birth, lastlogin) values (100, 'Rana', 'IHOPvG', '1986-11-27 05:35:06', '2017-05-24 17:15:44');
+
+commit;
