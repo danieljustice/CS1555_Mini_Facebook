@@ -13,6 +13,7 @@ DROP TABLE groups CASCADE CONSTRAINTS;
 DROP TABLE groupMembership CASCADE CONSTRAINTS;
 DROP TABLE pendingGroupmembers CASCADE CONSTRAINTS;
 
+--Create all tables associated with the database
 CREATE TABLE profile(
 	userID varchar2(20) not null,
 	name varchar2(50),
@@ -29,7 +30,8 @@ CREATE TABLE friends(
 	message varchar2(200),
 	CONSTRAINT friends_pk PRIMARY KEY(userID1, userID2, JDate),
 	CONSTRAINT friends_fk1 FOREIGN KEY (userID1) REFERENCES profile(userID),
-	CONSTRAINT friends_fk FOREIGN KEY (userID2) REFERENCES profile(userID)
+	CONSTRAINT friends_fk FOREIGN KEY (userID2) REFERENCES profile(userID),
+	CONSTRAINT friends_id_check CHECK (userID1 <> userID2)
 );
 
 CREATE TABLE pendingFriends(
@@ -38,7 +40,8 @@ CREATE TABLE pendingFriends(
 	message varchar2(200),
 	CONSTRAINT pendingFriends_pk PRIMARY KEY (fromID, toID),
 	CONSTRAINT pendingFriends_FK1 FOREIGN KEY (fromID) REFERENCES profile(userID),
-	CONSTRAINT pendingFriends_FK2 FOREIGN KEY (toID) REFERENCES profile(userID)
+	CONSTRAINT pendingFriends_FK2 FOREIGN KEY (toID) REFERENCES profile(userID),
+	CONSTRAINT pendindingFriends_id_check CHECK (fromID <> toID)
 );
 
 CREATE TABLE groups(
