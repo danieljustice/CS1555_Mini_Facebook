@@ -74,11 +74,14 @@ END;
 /
 
 --Add an entry to message recipient when a new message is created
+--*Adds entries only for those that go to users, not groups
 CREATE OR REPLACE TRIGGER INSERT_MESSAGE_RECIPIENT
 AFTER
 INSERT ON messages
 FOR EACH ROW
+WHERE toUserID IS NOT NULL
 BEGIN
-
+	INSERT INTO messageRecipient
+		values(:new.msgID, :new.toUserID);
 END;
 /
