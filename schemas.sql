@@ -12,6 +12,7 @@ DROP TABLE messageRecipient CASCADE CONSTRAINTS;
 DROP TABLE groups CASCADE CONSTRAINTS;
 DROP TABLE groupMembership CASCADE CONSTRAINTS;
 DROP TABLE pendingGroupmembers CASCADE CONSTRAINTS;
+DROP DOMAIN role_domain CASCADE;
 
 --Create all tables associated with the database
 CREATE TABLE profile(
@@ -73,12 +74,15 @@ CREATE TABLE messageRecipient(
 	CONSTRAINT messageRecipient_fk2 FOREIGN KEY (userID) REFERENCES profile(userID)
 );
 
+CREATE DOMAIN role_domain as varchar2(20)
+	CHECK ((VALUE IN('manager', 'user')) OR (VALUE IS NULL));
+
 CREATE TABLE groupMembership(
 	gID				varchar2(20) not null,
 	--user that is a part of the group
 	userID			varchar2(20) not null,
 	--roles are manager or member
-	role			varchar2(20),
+	role			role_domain,
 	--primary key is a combo of the group ID and a user in that group
 	CONSTRAINT groupMembership_pk PRIMARY KEY (gID, userID),
 	CONSTRAINT groupMembership_fk1 FOREIGN KEY (gID) REFERENCES groups(gID),
