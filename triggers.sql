@@ -1,6 +1,7 @@
---Here tha be Triggaa's!
+--Here be tha Triggaa's!
 
 
+--Delete an entry from pending friends when the corresponding entry is put into friends
 CREATE OR REPLACE TRIGGER FRIENDS_CANT_BE_PENDING
 AFTER 
 INSERT ON friends
@@ -14,6 +15,7 @@ BEGIN
 END;
 /
 
+--Delete everything associated with a profile when that profile is deleted(forced cascade)
 CREATE OR REPLACE TRIGGER CASCADE_PROFILE_DELETION
 AFTER 
 DELETE ON profile
@@ -34,6 +36,7 @@ BEGIN
 END;
 /
 
+--Delete an entry from pendingGroupmembers when the corresponding entry is put into groupMembership
 CREATE OR REPLACE TRIGGER MEMBERS_CANT_BE_PENDING
 AFTER
 INSERT ON groupMembership
@@ -44,6 +47,7 @@ BEGIN
 END;
 /
 
+--Delete everything associated with a messages when that message is deleted(forced cascade)
 CREATE OR REPLACE TRIGGER CASCADE_MESSAGE_DELETION
 AFTER
 DELETE ON messages
@@ -54,6 +58,7 @@ BEGIN
 END;
 /
 
+--Delete everything associated with a group when that group is deleted(forced cascade)
 CREATE OR REPLACE TRIGGER CASCADE_GROUP_DELETION
 AFTER
 DELETE ON groups
@@ -65,5 +70,15 @@ BEGIN
 	WHERE gID = :old.gID;
 	DELETE FROM messages
 	WHERE toGroupID = :old.gID;
+END;
+/
+
+--Add an entry to message recipient when a new message is created
+CREATE OR REPLACE TRIGGER INSERT_MESSAGE_RECIPIENT
+AFTER
+INSERT ON messages
+FOR EACH ROW
+BEGIN
+
 END;
 /
