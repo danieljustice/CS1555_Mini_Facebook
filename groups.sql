@@ -75,13 +75,15 @@ INSERT INTO groupMembership (userID, gID, role) values(87, 10, 'manager');
 
 --Insert some members pending membership into each group
 
-INSERT INTO pendingGroupmembership values(1, 35, "hi");
-INSERT INTO pendingGroupmembership values(2, 10, "hi");
-INSERT INTO pendingGroupmembership values(3, 99, "hi");
-INSERT INTO pendingGroupmembership values(4, 82, "hi");
-INSERT INTO pendingGroupmembership values(5, 19, "hi");
-INSERT INTO pendingGroupmembership values(6, 23, "hi");
-INSERT INTO pendingGroupmembership values(7, 89, "hi");
-INSERT INTO pendingGroupmembership values(8, 5, "hi");
-INSERT INTO pendingGroupmembership values(9, 77, "hi");
-INSERT INTO pendingGroupmembership values(10, 88, "hi");
+INSERT INTO pendingGroupmembers values(1, 35, 'hi');
+INSERT INTO pendingGroupmembers values(2, 10, 'hi');
+INSERT INTO pendingGroupmembers values(3, 99, 'hi');
+INSERT INTO pendingGroupmembers values(4, 82, 'hi');
+INSERT INTO pendingGroupmembers values(5, 19, 'hi');
+INSERT INTO pendingGroupmembers values(6, 23, 'hi');
+INSERT INTO pendingGroupmembers values(7, 89, 'hi');
+INSERT INTO pendingGroupmembers values(8, 5, 'hi');
+INSERT INTO pendingGroupmembers values(9, 77, 'hi');
+INSERT INTO pendingGroupmembers values(10, 88, 'hi');
+
+commit;
