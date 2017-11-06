@@ -58,7 +58,7 @@ CREATE TABLE messages(
 	message varchar2(200),
 	toUserID varchar2(20),
 	toGroupID varchar2(20),
-	dateSend date,
+	dateSent date,
 	CONSTRAINT messages_pk PRIMARY KEY (msgID),
 	CONSTRAINT messages_fk1 FOREIGN KEY (toUserID) REFERENCES profile(userID),
 	CONSTRAINT messages_fk2 FOREIGN KEY (toGroupID) REFERENCES groups(gID));
