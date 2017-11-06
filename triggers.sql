@@ -75,6 +75,7 @@ END;
 
 --Add an entry to message recipient when a new message is created
 --*Adds entries only for those that go to users, not groups
+--Needs fixed
 CREATE OR REPLACE TRIGGER INSERT_MESSAGE_RECIPIENT
 AFTER
 INSERT ON messages
