@@ -27,14 +27,15 @@ CREATE TABLE profile(
 CREATE TABLE friends(
 	userID1 varchar2(20) not null,
 	userID2 varchar2(20) not null,
-	JDate date not null,
+	JDate date,
 	message varchar2(200),
-	CONSTRAINT friends_pk PRIMARY KEY(userID1, userID2, JDate),
+	CONSTRAINT friends_pk PRIMARY KEY(userID1, userID2),
 	CONSTRAINT friends_fk1 FOREIGN KEY (userID1) REFERENCES profile(userID),
 	CONSTRAINT friends_fk FOREIGN KEY (userID2) REFERENCES profile(userID),
 	CONSTRAINT friends_id_check CHECK (userID1 <> userID2)
 );
 
+--Insert check to make sure the user pair is not already in friends- MIGHT BE A TRIGGER
 CREATE TABLE pendingFriends(
 	fromID varchar2(20) not null,
 	toID varchar2(20) not null,
@@ -74,9 +75,6 @@ CREATE TABLE messageRecipient(
 	CONSTRAINT messageRecipient_fk2 FOREIGN KEY (userID) REFERENCES profile(userID)
 );
 
---CREATE TYPE role_domain as varchar2(20)
-	--CONSTRAINT role_check CHECK ((VALUE IN('manager', 'user')) OR (VALUE IS NULL));
-
 CREATE TABLE groupMembership(
 	gID				varchar2(20) not null,
 	--user that is a part of the group
@@ -90,6 +88,7 @@ CREATE TABLE groupMembership(
 	CONSTRAINT groupMembership_check_role CHECK (role IN ('manager', 'user'))
 );
 
+--insert a check to make sure the user is not already in groupMembership- MIGHT BE A TRIGGER
 CREATE TABLE pendingGroupmembers(
 	gID				varchar2(20) not null,
 	--user who wants to joing the group
@@ -98,7 +97,7 @@ CREATE TABLE pendingGroupmembers(
 	--primary key is a combo of the group to be joined and the user that wants to join
 	CONSTRAINT pendingGroupmembers_pk PRIMARY KEY (gID, userID),
 	CONSTRAINT pendingGroupmembers_fk1 FOREIGN KEY (gID) REFERENCES groups(gID),
-	CONSTRAINT pendingGroupmembers_fk2 FOREIGN KEY (userID) REFERENCES profile(userID)
+	CONSTRAINT pendingGroupmembers_fk2 FOREIGN KEY (userID) REFERENCES profile(userID),
 );
 
 commit;
