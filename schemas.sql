@@ -97,7 +97,7 @@ CREATE TABLE pendingGroupmembers(
 	--primary key is a combo of the group to be joined and the user that wants to join
 	CONSTRAINT pendingGroupmembers_pk PRIMARY KEY (gID, userID),
 	CONSTRAINT pendingGroupmembers_fk1 FOREIGN KEY (gID) REFERENCES groups(gID),
-	CONSTRAINT pendingGroupmembers_fk2 FOREIGN KEY (userID) REFERENCES profile(userID),
+	CONSTRAINT pendingGroupmembers_fk2 FOREIGN KEY (userID) REFERENCES profile(userID)
 );
 
 commit;
