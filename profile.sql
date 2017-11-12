@@ -98,3 +98,4 @@ insert into profile (userID, name, password, date_of_birth, lastlogin) values (9
 insert into profile (userID, name, password, date_of_birth, lastlogin) values (98, 'Marten', 'mzchPSTU', '22-Oct-1965', TO_TIMESTAMP('2017-09-05 14:15:18', 'YYYY-MM-DD HH24:MI:SS'));
 insert into profile (userID, name, password, date_of_birth, lastlogin) values (99, 'Donielle', 'lrHUPI', '31-Mar-1932', TO_TIMESTAMP('2016-04-07 01:15:56', 'YYYY-MM-DD HH24:MI:SS'));
 insert into profile (userID, name, password, date_of_birth, lastlogin) values (100, 'Betsey', '5hFWkGQPJmqT', '02-Dec-1948', TO_TIMESTAMP('2016-03-06 15:06:11', 'YYYY-MM-DD HH24:MI:SS'));
+commit;

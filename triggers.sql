@@ -81,30 +81,47 @@ AFTER
 INSERT ON messages
 FOR EACH ROW
 BEGIN
-	INSERT INTO messageRecipient
-		values(:new.msgID, :new.toUserID);
+	if :new.toUserID is not null then
+		INSERT INTO messageRecipient
+			values(:new.msgID, :new.toUserID);
+	end if;
 END;
 /
 
 --Insert inverse of the friend pair to make duplicate checking easier
-CREATE OR REPLACE TRIGGER FRIEND_DUPLICATE_INSERT
-AFTER
-INSERT ON friends
-FOR EACH ROW
-BEGIN
-	INSERT INTO friends
-		values(:new.userID2, :new.userID1, :new.JDate, :new.message);
-END;
-/
+--Get rid of: mutating trigger
+--Fix table so it won't duplicate any values like this
+--CREATE OR REPLACE TRIGGER FRIEND_DUPLICATE_INSERT
+--AFTER
+--INSERT ON friends
+--FOR EACH ROW
+--BEGIN
+	--INSERT INTO friends
+		--values(:new.userID2, :new.userID1, :new.JDate, :new.message);
+--END;
+--/
 
 --Delete the inverse of the friend pair
-CREATE OR REPLACE TRIGGER CASCACE_FRIEND_DELETION
-AFTER
-DELETE ON friends
+--CREATE OR REPLACE TRIGGER CASCACE_FRIEND_DELETION
+--AFTER
+--DELETE ON friends
+--FOR EACH ROW
+--BEGIN
+	--DELETE FROM friends
+	--WHERE userID1 = :old.userID2 and userID2 = :old.userID1;
+--END;
+--/
+
+CREATE OR REPLACE TRIGGER FRIEND_DUPLICATE_CHECK
+BEFORE
+INSERT ON friends
 FOR EACH ROW
+DECLARE qty number:= 0;
 BEGIN
-	DELETE FROM friends
-	WHERE userID1 = :old.userID2 and userID2 = :old.userID1;
+	select count(*) into qty from friends where userID1 = :new.userID2 and userID2 = :new.userID1;
+	if qty > 0 then
+		raise_application_error(-20001, 'Duplicate value inserted.');
+	end if;
 END;
 /
 
@@ -117,7 +134,7 @@ DECLARE qty number := 0;
 BEGIN
 	select count(*) into qty from pendingFriends where toID = :new.fromID and fromID = :new.toID;
 	if qty > 0 then
-		ROLLBACK;
+		raise_application_error(-20002, 'Duplicate value inserted.');
 	end if;
 END;
 /
@@ -131,7 +148,7 @@ DECLARE qty number := 0;
 BEGIN
 	SELECT COUNT(*) INTO qty from groupMembership where userID = :new.userID and gID = :new.userID;
 	if qty > 0 then
-		ROLLBACK;
+		raise_application_error(-20003, 'No a group member cannot be inserted into the pendingGroupmembers table.');
 	end if;
 END;
 /
@@ -145,7 +162,7 @@ DECLARE qty number := 0;
 BEGIN
 	SELECT COUNT(*) INTO qty FROM friends where userID1 = :new.toID and userID2 = :new.fromID;
 	if qty > 0 then
-		ROLLBACK;
+		raise_application_error(-20004, 'A friend request cannot be made by already existing friends.');
 	end if;
 END;
 /

@@ -312,3 +312,4 @@ INSERT INTO friends (userID1, userID2, JDate, message) VALUES (95, 96, TO_DATE('
 INSERT INTO friends (userID1, userID2, JDate, message) VALUES (95, 97, TO_DATE('09/12/1953 10:31', 'MM/DD/YYYY HH12:MI'), '');
 INSERT INTO friends (userID1, userID2, JDate, message) VALUES (95, 99, TO_DATE('09/12/1953 10:31', 'MM/DD/YYYY HH12:MI'), '');
 INSERT INTO friends (userID1, userID2, JDate, message) VALUES (97, 98, TO_DATE('06/06/2013 08:46', 'MM/DD/YYYY HH12:MI'), '');
+commit;
