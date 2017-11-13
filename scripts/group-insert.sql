@@ -1,0 +1,11 @@
+INSERT INTO groups (gID, name, description) VALUES (1, 'Pokemon Club', 'Pokemon Club group');
+INSERT INTO groups (gID, name, description) VALUES (2, 'Yodeling Group', 'Yodeling Group group');
+INSERT INTO groups (gID, name, description) VALUES (3, 'Pokemon Club', 'Pokemon Club group');
+INSERT INTO groups (gID, name, description) VALUES (4, 'Golf Club', 'Golf Club group');
+INSERT INTO groups (gID, name, description) VALUES (5, 'Pokemon Club', 'Pokemon Club group');
+INSERT INTO groups (gID, name, description) VALUES (6, 'Golf Club', 'Golf Club group');
+INSERT INTO groups (gID, name, description) VALUES (7, 'Golf Club', 'Golf Club group');
+INSERT INTO groups (gID, name, description) VALUES (8, 'Golf Club', 'Golf Club group');
+INSERT INTO groups (gID, name, description) VALUES (9, 'Yodeling Group', 'Yodeling Group group');
+INSERT INTO groups (gID, name, description) VALUES (10, 'Golf Club', 'Golf Club group');
+commit;

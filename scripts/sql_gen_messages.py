@@ -14,7 +14,8 @@ num_of_users = 100
 num_of_groups = 10
 msg_id = 0
 max_messages = 300
-f = open('messages-insert.sql', 'a')
+f = open('messages-insert.sql', 'w+')
+# f.write("commit;\n")
 rand.seed(1)
 for i in range (1, num_of_users+1):
     #person sending the messages ID;
@@ -38,33 +39,16 @@ for i in range (1, num_of_users+1):
         #msg_id will start at 1 because it is incremented before being used
         msg_id = msg_id + 1 
         if msg_id > max_messages:
-            exit(0)
+            break
         #get random message
         message = rand.choice(messages)
         
 
         date_sent = RandomDate.randomDate("1/1/1852 1:30 PM", "11/1/2017 4:50 AM", rand.random())
 
-        f.write("INSERT INTO messages (msgID, fromID, message, toUserID, toGroupID, dateSent) VALUES (" + str(msg_id) + ", " + str(from_id) + ", '" + message + "', " + str(to_id) + ", " + str(group_id) +", " + "TO_TIMESTAMP('" + date_sent + "', 'MM-DD-YYYY HH12:MI:SS'));\n" )
+        f.write("INSERT INTO messages (msgID, fromID, message, toUserID, toGroupID, dateSent) VALUES (" + str(msg_id) + ", " + str(from_id) + ", '" + message + "', " + str(to_id) + ", " + str(group_id) +", " + "TO_TIMESTAMP('" + date_sent + "', 'MM-DD-YYYY HH12:MI:SS'));\n" )    
 
-
-
-# for i in range (251, 301):
-
-#    day_u = rand.randint(1,28)
-#    day = str(day_u)
-#    if (day_u < 10):
-#       day = '0' + str(day)
-
-#    year = 2009 + rand.randint(0,8)
-#    fromID = rand.randint(2, 110)
-#    toGroup = rand.randint(1, 10)
-
-#    f.write('INSERT INTO messages (msgID, fromID, message, toUserID, toGroupID, dateSent) VALUES (' + str(i) + ', ' + str(fromID) + ', \'' + rand.choice(messages) + '\', ' + 'NULL' + ', ' + str(toGroup) + ', ' + '\'' + day + '-' + rand.choice(mons) + '-' + str(year) + '\');\n' )
-
-
-
-
-
+f.write("commit;\n")
+# f.write("commit;\n")
 f.close()
 
