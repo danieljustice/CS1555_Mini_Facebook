@@ -8,7 +8,7 @@ import RandomDate as RandomDate
 messages = ["", "Let us be friends!", "yo friend"] # put whatever messages you want in here
 
 
-f = open('friendship-insert.sql', 'a')
+f = open('friendship-insert.sql', 'w+')
 
 rand.seed(1)
 max_friendships = 200
@@ -26,5 +26,6 @@ for user1 in range (1, max_users):
 
             user2 = rand.randrange(user2+1, max_users+1)
 
+f.write("commit;\n")
 f.close()
 

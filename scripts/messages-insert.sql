@@ -298,3 +298,4 @@ INSERT INTO messages (msgID, fromID, message, toUserID, toGroupID, dateSent) VAL
 INSERT INTO messages (msgID, fromID, message, toUserID, toGroupID, dateSent) VALUES (298, 9, 'how are you', 72, null, TO_TIMESTAMP('10/27/1936 11:18', 'MM-DD-YYYY HH12:MI:SS'));
 INSERT INTO messages (msgID, fromID, message, toUserID, toGroupID, dateSent) VALUES (299, 9, 'hi', 45, null, TO_TIMESTAMP('11/26/1949 09:03', 'MM-DD-YYYY HH12:MI:SS'));
 INSERT INTO messages (msgID, fromID, message, toUserID, toGroupID, dateSent) VALUES (300, 9, 'You are awesome', 98, null, TO_TIMESTAMP('10/15/1969 09:08', 'MM-DD-YYYY HH12:MI:SS'));
+commit;
