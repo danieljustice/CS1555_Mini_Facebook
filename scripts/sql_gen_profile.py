@@ -60,7 +60,7 @@ for i in range (1, 101):
 
    last_login = '\'' + str(ll_day) + '-' + rand.choice(mons) + '-' + str(ll_year) + ' ' + str(ll_hour) + '.' + str(ll_min) + '.' + str(ll_sec) + '.000000 ' + isampm + '\''
    email = rand.choice(string.ascii_lowercase) + rand.choice(string.ascii_lowercase) + rand.choice(string.ascii_lowercase) + rand.randrange(0, 100).__str__() + "@pitt.edu'" 
-   f.write('INSERT INTO profile (userID, name, password, date_of_birth, last_login, email) VALUES (' + str(i) + ', \'' + c_first_name + ' ' + c_last_name + '\', \'' + password + '\', ' + dob + ', ' + last_login + ',\'' + email + ');\n' )
+   f.write('INSERT INTO profile (userID, name, password, date_of_birth, lastlogin, email) VALUES (' + str(i) + ', \'' + c_first_name + ' ' + c_last_name + '\', \'' + password + '\', ' + dob + ', ' + last_login + ',\'' + email + ');\n' )
 
 
 f.close()
