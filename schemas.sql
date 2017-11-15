@@ -21,6 +21,7 @@ CREATE TABLE profile(
 	password varchar2(50),
 	date_of_birth date,
 	lastlogin timestamp,
+	email varchar2(50),
 	CONSTRAINT profile_pk PRIMARY KEY (userID)
 );
 
