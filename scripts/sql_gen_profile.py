@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 import random as rand
-
+import string
 first_names = ["Albert", "Barbara", "Cindy", "Daniel", "Evan", "Francisca", "George", "Hana", "Ivan", "Jordan"] # Create some last names
 last_names = ["Albatross", "Bufflehead", "Cliff", "Dove"] # Create some last names
 
@@ -12,8 +12,10 @@ ampm = ['AM', 'PM']
 mons = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC']
 
 
-f = open('profile-insert.sql', 'a')
+f = open('profile-insert.sql', 'w+')
 
+
+rand.seed(1)
 for i in range (1, 101):
    c_first_name = rand.choice(first_names)
    c_last_name = rand.choice(last_names)
@@ -57,8 +59,8 @@ for i in range (1, 101):
    isampm = rand.choice(ampm)
 
    last_login = '\'' + str(ll_day) + '-' + rand.choice(mons) + '-' + str(ll_year) + ' ' + str(ll_hour) + '.' + str(ll_min) + '.' + str(ll_sec) + '.000000 ' + isampm + '\''
-   
-   f.write('INSERT INTO profile (userID, name, password, date_of_birth, last_login) VALUES (' + str(i) + ', \'' + c_first_name + ' ' + c_last_name + '\', \'' + password + '\', ' + dob + ', ' + last_login + ');\n' )
+   email = rand.choice(string.ascii_lowercase) + rand.choice(string.ascii_lowercase) + rand.choice(string.ascii_lowercase) + rand.randrange(0, 100).__str__() + "@pitt.edu'" 
+   f.write('INSERT INTO profile (userID, name, password, date_of_birth, last_login, email) VALUES (' + str(i) + ', \'' + c_first_name + ' ' + c_last_name + '\', \'' + password + '\', ' + dob + ', ' + last_login + ',\'' + email + ');\n' )
 
 
 f.close()
