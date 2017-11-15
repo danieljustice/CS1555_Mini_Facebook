@@ -88,30 +88,6 @@ BEGIN
 END;
 /
 
---Insert inverse of the friend pair to make duplicate checking easier
---Get rid of: mutating trigger
---Fix table so it won't duplicate any values like this
---CREATE OR REPLACE TRIGGER FRIEND_DUPLICATE_INSERT
---AFTER
---INSERT ON friends
---FOR EACH ROW
---BEGIN
-	--INSERT INTO friends
-		--values(:new.userID2, :new.userID1, :new.JDate, :new.message);
---END;
---/
-
---Delete the inverse of the friend pair
---CREATE OR REPLACE TRIGGER CASCACE_FRIEND_DELETION
---AFTER
---DELETE ON friends
---FOR EACH ROW
---BEGIN
-	--DELETE FROM friends
-	--WHERE userID1 = :old.userID2 and userID2 = :old.userID1;
---END;
---/
-
 CREATE OR REPLACE TRIGGER FRIEND_DUPLICATE_CHECK
 BEFORE
 INSERT ON friends
@@ -166,3 +142,44 @@ BEGIN
 	end if;
 END;
 /
+
+--Add a message to messageRecipients
+CREATE OR REPLACE TRIGGER ADD_TO_RECIPIENTS
+AFTER
+INSERT ON messages
+FOR EACH ROW
+BEGIN
+	IF :new.toUserID = null then
+		INSERT INTO messageRecipient values(:new.msgID, :new.toUserID);
+	END IF;
+END;
+/
+
+
+
+--The following are all similar and have a problem on what the message Id should be
+--Add a message when a pair is added to pendingfriends
+--CREATE OR REPLACE TRIGGER ADD_PF_MESSAGE
+--AFTER
+--INSERT ON pendingFriends
+--FOR EACH ROW
+--DECLARE qty number:= 0;
+--BEGIN
+	--SELECT MAX(msgID) INTO qty FROM messageRecipient;
+	--INSERT INTO messages
+	--values(qty + 1, :new.message, :new.fromID, :new.toID, null, null);
+--END;
+--/
+
+--Add a message when a pair is added to friends
+--CREATE OR REPLACE TRIGGER ADD_F_MESSAGE
+--AFTER
+--INSERT ON friends
+--FOR EACH ROW
+--DECLARE qty number:= 0;
+--BEGIN
+	--SELECT MAX(msgID) INTO qty FROM messageRecipient;
+	--INSERT INTO messages
+	--values(qty + 1, :new.message, :new.userID1, :new.userID2, null, null);
+--END;
+--/
