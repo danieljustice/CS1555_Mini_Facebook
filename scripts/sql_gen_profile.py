@@ -1,10 +1,10 @@
 #!/usr/bin/env python
 import random as rand
 
-first_names = [] # Create some last names
-last_names = [] # Create some last names
+first_names = ["Albert", "Barbara", "Cindy", "Daniel", "Evan", "Francisca", "George", "Hana", "Ivan", "Jordan"] # Create some last names
+last_names = ["Albatross", "Bufflehead", "Cliff", "Dove"] # Create some last names
 
-passwords = [] # Create some random passwords
+passwords = ["Password 1","Password 2","Password 3","Password 4","Password 5","Password 6","Password 7"] # Create some random passwords
 
 ampm = ['AM', 'PM']
 
