@@ -11,7 +11,7 @@ SELECT * FROM groupMembership where userID = 1;
 
 
 --Test select statements from various tables
-SELECT * FROM messages where toID = 55;
+SELECT * FROM messages where toUserID = 55;
 SELECT gID from groups;
 SELECT * FROM pendingFriends;
 SELECT msgID FROM messageRecipient where userID = 43;
@@ -39,7 +39,7 @@ SELECT * FROM pendingGroupmembers where userID = 45;
 --Check group delete trigger
 DELETE FROM groups where gID = 1;
 commit;
-SELECT * FROM messges where gID = 1;
+SELECT * FROM messages where gID = 1;
 
 --Check pendingFriends duplicates
 INSERT INTO pendingFriends
@@ -60,7 +60,8 @@ commit;
 INSERT INTO friends
 values(1 , 2, null, 'Yup');
 commit;
-INSERT INTO pendingFriends(1, 2, 'Throw an error please');
+INSERT INTO pendingFriends
+values(1, 2, 'Throw an error please');
 commit;
 
 --Check for friend insertion duplicate
