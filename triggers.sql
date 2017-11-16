@@ -16,25 +16,25 @@ END;
 /
 
 --Delete everything associated with a profile when that profile is deleted(forced cascade)
-CREATE OR REPLACE TRIGGER CASCADE_PROFILE_DELETION
-AFTER 
-DELETE ON profile
-FOR EACH ROW
-BEGIN
-	DELETE FROM friends
-		WHERE userID1 = :old.userID OR userID2 = :old.userID;
-	DELETE FROM pendingFriends
-		WHERE fromID = :old.userID OR toID = :old.userID;
-	DELETE FROM groupMembership
-		WHERE userID = :old.userID;
-	DELETE FROM pendingGroupmembers
-		WHERE userID = :old.userID;
-	DELETE FROM messageRecipient
-		WHERE userID = :old.userID;
-	DELETE FROM messages
-		WHERE fromID = :old.userID or toUserID = :old.userID;
-END;
-/
+--CREATE OR REPLACE TRIGGER CASCADE_PROFILE_DELETION
+--AFTER 
+--DELETE ON profile
+--FOR EACH ROW
+--BEGIN
+	--DELETE FROM friends
+		--WHERE userID1 = :old.userID OR userID2 = :old.userID;
+	--DELETE FROM pendingFriends
+		--WHERE fromID = :old.userID OR toID = :old.userID;
+	--DELETE FROM groupMembership
+		--WHERE userID = :old.userID;
+	--DELETE FROM pendingGroupmembers
+		--WHERE userID = :old.userID;
+	--DELETE FROM messageRecipient
+		--WHERE userID = :old.userID;
+	--DELETE FROM messages
+		--WHERE fromID = :old.userID or toUserID = :old.userID;
+--END;
+--/
 
 --Delete an entry from pendingGroupmembers when the corresponding entry is put into groupMembership
 CREATE OR REPLACE TRIGGER MEMBERS_CANT_BE_PENDING
@@ -48,15 +48,15 @@ END;
 /
 
 --Delete everything associated with a messages when that message is deleted(forced cascade)
-CREATE OR REPLACE TRIGGER CASCADE_MESSAGE_DELETION
-AFTER
-DELETE ON messages
-FOR EACH ROW
-BEGIN
-	DELETE FROM messageRecipient
-	WHERE msgID = :old.msgID;
-END;
-/
+--CREATE OR REPLACE TRIGGER CASCADE_MESSAGE_DELETION
+--AFTER
+--DELETE ON messages
+--FOR EACH ROW
+--BEGIN
+	--DELETE FROM messageRecipient
+	--WHERE msgID = :old.msgID;
+--END;
+--/
 
 --Delete everything associated with a group when that group is deleted(forced cascade)
 CREATE OR REPLACE TRIGGER CASCADE_GROUP_DELETION
