@@ -59,19 +59,19 @@ END;
 --/
 
 --Delete everything associated with a group when that group is deleted(forced cascade)
-CREATE OR REPLACE TRIGGER CASCADE_GROUP_DELETION
-AFTER
-DELETE ON groups
-FOR EACH ROW
-BEGIN
-	DELETE FROM groupMembership
-	WHERE gID = :old.gID;
-	DELETE FROM pendingGroupmembers
-	WHERE gID = :old.gID;
-	DELETE FROM messages
-	WHERE toGroupID = :old.gID;
-END;
-/
+--CREATE OR REPLACE TRIGGER CASCADE_GROUP_DELETION
+--AFTER
+--DELETE ON groups
+--FOR EACH ROW
+--BEGIN
+	--DELETE FROM groupMembership
+	--WHERE gID = :old.gID;
+	--DELETE FROM pendingGroupmembers
+	--WHERE gID = :old.gID;
+	--DELETE FROM messages
+	--WHERE toGroupID = :old.gID;
+--END;
+--/
 
 --Add an entry to message recipient when a new message is created
 --*Adds entries only for those that go to users, not groups
