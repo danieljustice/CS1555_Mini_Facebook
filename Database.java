@@ -2,6 +2,8 @@ import java.sql.*;
 
 public class Database
 {
+	private static Connection dbcon;
+
 	public Database()
 	{
 
@@ -174,7 +176,17 @@ logout in the profile relation,*/
 	//Perform tests for the functions
 	public static void main(String args[])
 	{
+		//Ask for username and password to Oracle
 
+		//Open the connection
+		DriverManager.registerDriver(new oracle.jdbc.driver.OracleDriver());
+		String url = "jdbc:oracle:thin:@class3.cs.pitt.edu:1521:dbclass";
+		dbcon = DriverManager.getConnection(url, username, password);
+
+		//tests for the above methods
+
+		//Close the connection
+		dbcon.close();
 	}
 }
 
