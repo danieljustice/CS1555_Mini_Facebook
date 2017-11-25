@@ -1,29 +1,36 @@
 import java.sql.*;
+import java.util.*;
 
 public class Database
 {
-	public Database()
-	{
+	private Connection dbcon;
 
+	//Client must ask for user and password themselves
+	public Database(Stirng username, String password) throws SQLException
+	{
+		//Open the connection
+		DriverManager.registerDriver(new oracle.jdbc.driver.OracleDriver());
+		String url = "jdbc:oracle:thin:@class3.cs.pitt.edu:1521:dbclass";
+		dbcon = DriverManager.getConnection(url, username, password);
 	}
 
 	//Implement the following functions
 
 	//Given a name, email address, and date of birth, add a new user to the system by inserting as
 	//new entry in the profile relation.
-	public void createUser(String userID, String name, String password, String dob, String last_login, String email)
+	public void createUser(String userID, String name, String password, String dob, String email)
 	{	
 		//Add something to convert the date to a timestamp
 		try
 		{
-			PreparedStatement st1 = dbcon.PreparedStatement("INSERT INTO profile values(?, ?, ?, ?, ?, ?)");
+			PreparedStatement st1 = dbcon.prepareStatement("INSERT INTO profile values(?, ?, ?, ?, ?, TO_TIMESTAMP(?, 'YYYY-MM-DD HH24:MI:SS'))");
 			st1.setString(1, userID);
 			st1.setString(2, name);
 			st1.setString(3, password);
 			st1.setString(4, dob);
-			st1.setString(5, last_login);
+			st1.setString(5, null);
 			st1.setString(6, email);
-			st1.executeQuery();
+			st1.executeUpdate();
 		}
 		catch(SQLException e1)
 		{
@@ -31,7 +38,7 @@ public class Database
 			while(e1 != null)
 			{
 				System.out.println("Message = "+ e1.getMessage());
-				System.out.println("SQLState = "+ e1.getSQLstate());
+				System.out.println("SQLState = "+ e1.getSQLState());
 				System.out.println("SQLState = "+ e1.getErrorCode());
 				e1 = e1.getNextException();
 			}
@@ -40,8 +47,44 @@ public class Database
 
 	//Given userID and password, login as the user in the system when an appropriate match is
 	//found
-	public boolean Login()
+	//Return true if logged in successfully, false otherwise
+	public boolean Login(String userID, String password)
 	{
+		try
+		{
+			//Get the password given the userID
+			PreparedStatement st1 = dbcon.prepareStatement("SELECT password FROM profile WHERE userID = ?");
+			st1.setString(1, userID);
+			ResultSet  result = st1.executeQuery();
+			String pw = result.getString("password");
+
+			//Compare the password with what's given
+			if(password.equals(pw))
+			{
+				//Fix so it can add proper date
+				/*PreparedStatement st2 = dbcon.prepareStatement("UPDATE profile SET lastlogin = TO_TIMESTAMP(?, 'YYYY-MM-DD HH24:MI:SS') WHERE userID = ?");
+				st2.setString(1, new SimpleDateFormat("YYYY-MM-DD HH24:MM:SS").format(new Date()));
+				st2.setString(2, userID);
+				st2.executeUpdatey();*/
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+		}
+		catch(SQLException e1)
+		{
+			System.out.println("SQL Error");
+			while(e1 != null)
+			{
+				System.out.println("Message = "+ e1.getMessage());
+				System.out.println("SQLState = "+ e1.getSQLState());
+				System.out.println("SQLState = "+ e1.getErrorCode());
+				e1 = e1.getNextException();
+			}
+			return false;
+		}
 
 	}
 
@@ -50,9 +93,54 @@ public class Database
 	//should be prompted to enter a message to be sent along with the request. A last confirmation
 	//should be requested of the user before an entry is inserted into the pendingFriends relation,
 	//and success or failure feedback is displayed for the user.
-	public boolean initiateFriendship()
+	public boolean initiateFriendship(String fromID, String toID)
 	{
+		//Get a message from the user
+		System.out.println("Sending a request to " + toID);
+		Scanner scan = new Scanner(System.in);
+		System.out.println("Enter a message for your friendrequest:");
+		String msg = scan.nextLine();
 
+		//Confirm request
+		System.out.println("Are you sure you want to send a request to " + toID + "?");
+		System.out.println("Enter yes or no:");
+		String response = scan.nextLine();
+		while(!response.equalsIgnoreCase("yes") && !response.equalsIgnoreCase("no"))
+		{
+			System.out.println("Enter yes or no:");
+			response = scan.nextLine();
+		}
+
+		//Need to add error catching
+		if(response.equalsIgnoreCase("yes"))
+		{
+			try
+			{
+				PreparedStatement st1 = dbcon.prepareStatement("INSERT INTO pendingFriends values(?, ?, ?)");
+				st1.setString(1, fromID);
+				st1.setString(2, toID);
+				st1.setString(3, msg);
+				st1.executeUpdate();
+				return true;
+			}
+			catch(SQLException e1)
+			{
+				//Print errors
+				System.out.println("SQL Error");
+				while(e1 != null)
+				{
+					System.out.println("Message = "+ e1.getMessage());
+					System.out.println("SQLState = "+ e1.getSQLState());
+					System.out.println("SQLState = "+ e1.getErrorCode());
+					e1 = e1.getNextException();
+				}
+				return false;
+			}
+		}
+		else
+		{
+			return false;
+		}
 	}
 
 	//This task should first display a formatted, numbered list of all outstanding friends and group
@@ -66,12 +154,12 @@ public class Database
 
 	}
 
-	/*This task supports the browsing of the user’s friends and of their friends’ profiles. It first
-	displays each of the user’s friends’ names and userIDs and those of any friend of those friends.
-	Then it allows the user to either retrieve a friend’s entire profile by entering the appropriate
+	/*This task supports the browsing of the user's friends and of their friends' profiles. It first
+	displays each of the user's friends' names and userIDs and those of any friend of those friends.
+	Then it allows the user to either retrieve a friend's entire profile by entering the appropriate
 	userID or exit browsing and return to the main menu by entering 0 as a userID. When selected,
-	a friend’s profile should be displayed in a nicely formatted way, after which the user should be
-	prompted to either select to retrieve another friend’s profile or return to the main menu.*/
+	a friend's profile should be displayed in a nicely formatted way, after which the user should be
+	prompted to either select to retrieve another friend's profile or return to the main menu.*/
 	public void displayFriends()
 	{
 
@@ -79,35 +167,114 @@ public class Database
 
 	/*Given a name, description, and membership limit, add a new group to the system, add the
 	user as its first member with the role manager.*/
-	public void createGroup()
+	public void createGroup(String name, String desc, int limit, String userID)
 	{
+		try
+		{
+			PreparedStatement st1 = dbcon.prepareStatement("INSERT INTO groups values(?, ?, ?)");
+			PreparedStatement st2 = dbcon.prepareStatement("INSERT INTO groupMembership values(?, ?, 'manager')");
 
+			//Not sure how to determine gID
+			st1.setString(2, name);
+			st1.setString(3, desc);
+			st1.executeUpdate();
+
+			//Add the user to the group as a manager
+			st2.setString(userID);
+			st2.executeUpdate();
+		}
+		catch(SQLException e1)
+		{
+			//Print errors
+			System.out.println("SQL Error");
+			while(e1 != null)
+			{
+				System.out.println("Message = "+ e1.getMessage());
+				System.out.println("SQLState = "+ e1.getSQLState());
+				System.out.println("SQLState = "+ e1.getErrorCode());
+				e1 = e1.getNextException();
+			}
+		}
 	}
 
 	/*Given a user and a group, create a pending request of adding to group (if not violate the
-	group’s membership limit). The user should be prompted to enter a message to be sent along
+	group's membership limit). The user should be prompted to enter a message to be sent along
 	with the request and inserted in the pendingGroupmembers relation.*/
-	public void initiateAddingGroup()
+	public void initiateAddingGroup(String userID, String gID)
 	{
+		try
+		{
+			Scanner scan = new Scanner(System.in);
+			System.out.println("Enter a message for your group request:");
+			String msg = scan.nextLine();
 
+			//Add the request to the database
+			PreparedStatement st1 = dbcon.prepareStatement("INSERT INTO pendingGroupmembers values(?, ?, ?)");
+			st1.setString(1, gID);
+			st1.setString(2, userID);
+			st1.setString(3, msg);
+			st1.executeUpdate();
+		}
+		catch(SQLException e1)
+		{
+			//Print errors
+			System.out.println("SQL Error");
+			while(e1 != null)
+			{
+				System.out.println("Message = "+ e1.getMessage());
+				System.out.println("SQLState = "+ e1.getSQLState());
+				System.out.println("SQLState = "+ e1.getErrorCode());
+				e1 = e1.getNextException();
+			}
+		}
 	}
 
 	/*With this the user can send a message to one friend given his userID. The application should
 	display the name of the recipient and the user should be prompted to enter the text of the
-	message, which could be multi-lined. Once entered, the message should be “sent” to the user
+	message, which could be multi-lined. Once entered, the message should be 'sent' to the user
 	by adding appropriate entries into the messages and messageRecipients relations by creating
 	a trigger. The user should lastly be shown success or failure feedback.*/
-	public void sendMessageToUser()
+	public void sendMessageToUser(String toID, String fromID)
 	{
+		//Prompt the user for a message to send
+		//Change so it can be multilined
+		Scanner scan = new Scanner(System.in);
+		System.out.println("Enter your message: ");
+		String msg = scan.nextLine();
 
+		try
+		{
+			PreparedStatement st1 = dbcon.prepareStatement("INSERT INTO messages values(?, ?, ?, ?, NULL, ?)");
+			//Not sure how to determine message ID
+			st1.setString(2, fromID);
+			st1.setString(3, msg);
+			st1.setString(4, toID);
+			//Not sure of how to get the current date
+			st1.executeUpdate();
+
+			System.out.println("Sent successfully");
+		}
+		catch
+		{
+			//Print errors
+			System.out.println("Error: message failed to send");
+			System.out.println("SQL Error");
+			while(e1 != null)
+			{
+				System.out.println("Message = "+ e1.getMessage());
+				System.out.println("SQLState = "+ e1.getSQLState());
+				System.out.println("SQLState = "+ e1.getErrorCode());
+				e1 = e1.getNextException();
+			}
+		}
 	}
 
 	/*With this the user can send a message to a recipient group, if the user is within the group.
 	Every member of this group should receive the message. The user should be prompted to enter
 	the text of the message, which could be multi-lined. Then the created new message should
-	be “sent” to the user by adding appropriate entries into the messages and messageRecipients
+	be 'sent' to the user by adding appropriate entries into the messages and messageRecipients
 	relations by creating a trigger. The user should lastly be shown success or failure feedback.
-	Note that if the user sends a message to one friend, you only need to put the friend’s userID
+	Note that if the user sends a message to one friend, you only need to put the friend's userID
 	to ToUserID in the table of messages. If the user wants to send a message to a group, you need
 	to put the group ID to ToGroupID in the table of messages and use a trigger to populate the
 	messageRecipient table with proper user ID information as defined by the groupMembership
@@ -132,9 +299,9 @@ public class Database
 	}
 
 	/*Given a string on which to match any user in the system, any item in this string must be
-	matched against any significant field of a user’s profile. That is if the user searches for “xyz
-	abc”, the results should be the set of all profiles that match “xyz” union the set of all profiles
-	that matches “abc”*/
+	matched against any significant field of a user's profile. That is if the user searches for 'xyz
+	abc', the results should be the set of all profiles that match 'xyz' union the set of all profiles
+	that matches 'abc'*/
 	public void searchForUser()
 	{
 
@@ -164,7 +331,7 @@ public class Database
 
 	}
 
-	/*This option should cleanly shut down and exit the program after marking the time of the user’s
+	/*This option should cleanly shut down and exit the program after marking the time of the user's
 logout in the profile relation,*/
 	public void Logout()
 	{
@@ -172,25 +339,9 @@ logout in the profile relation,*/
 	}
 
 	//Perform tests for the functions
-	public static void main(String args[])
+	public void closeDB()
 	{
-
+		//Close the connection
+		dbcon.close();
 	}
 }
-
-
-10. displayMessages
-
-11. displayNewMessages
-
-12. searchForUser
-
-13. threeDegress
-
-14. topMessages
-
-4
-15. dropUser
-
-16. LogOut
-
