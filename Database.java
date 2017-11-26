@@ -47,7 +47,7 @@ public class Database
 	//Given userID and password, login as the user in the system when an appropriate match is
 	//found
 	//Return true if logged in successfully, false otherwise
-	public boolean Login(String userID, String password)
+	public boolean loginUser(String userID, String password)
 	{
 		try
 		{
@@ -55,7 +55,10 @@ public class Database
 			PreparedStatement st1 = dbcon.prepareStatement("SELECT password FROM profile WHERE userID = ?");
 			st1.setString(1, userID);
 			ResultSet  result = st1.executeQuery();
+			result.next();
 			String pw = result.getString("password");
+
+			//System.out.println("input: " + password + "\nresult: " + pw);
 
 			//Compare the password with what's given
 			if(password.equals(pw))
