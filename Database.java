@@ -6,7 +6,7 @@ public class Database
 	private Connection dbcon;
 
 	//Client must ask for user and password themselves
-	public Database(Stirng username, String password) throws SQLException
+	public Database(String username, String password) throws SQLException
 	{
 		//Open the connection
 		DriverManager.registerDriver(new oracle.jdbc.driver.OracleDriver());
@@ -23,13 +23,12 @@ public class Database
 		//Add something to convert the date to a timestamp
 		try
 		{
-			PreparedStatement st1 = dbcon.prepareStatement("INSERT INTO profile values(?, ?, ?, ?, ?, TO_TIMESTAMP(?, 'YYYY-MM-DD HH24:MI:SS'))");
+			PreparedStatement st1 = dbcon.prepareStatement("INSERT INTO profile values(?, ?, ?, ?, NULL, ?)");
 			st1.setString(1, userID);
 			st1.setString(2, name);
 			st1.setString(3, password);
 			st1.setString(4, dob);
-			st1.setString(5, null);
-			st1.setString(6, email);
+			st1.setString(5, email);
 			st1.executeUpdate();
 		}
 		catch(SQLException e1)
@@ -180,7 +179,7 @@ public class Database
 			st1.executeUpdate();
 
 			//Add the user to the group as a manager
-			st2.setString(userID);
+			st2.setString(2, userID);
 			st2.executeUpdate();
 		}
 		catch(SQLException e1)
@@ -254,7 +253,7 @@ public class Database
 
 			System.out.println("Sent successfully");
 		}
-		catch
+		catch(SQLException e1)
 		{
 			//Print errors
 			System.out.println("Error: message failed to send");
@@ -286,9 +285,28 @@ public class Database
 
 	/*When the user selects this option, the entire contents of every message sent to the user should
 	be displayed in a nicely formatted way.*/
-	public void displayMessages()
+	public void displayMessages(String userID)
 	{
+		try
+		{
+			//Get all the messages sent to the user and order by dateSent descending
+			PreparedStatement st1 = dbcon.prepareStatement("SELECT fromID, message, dateSent FROM messages WHERE toUserID = ? ORDER BY dateSent DESC");
+			st1.setString(1, userID);
+			ResultSet results = st1.executeQuery();
 
+			//Loop through and display the results
+		}
+		catch(SQLException e1)
+		{
+			System.out.println("SQL Error");
+			while(e1 != null)
+			{
+				System.out.println("Message = "+ e1.getMessage());
+				System.out.println("SQLState = "+ e1.getSQLState());
+				System.out.println("SQLState = "+ e1.getErrorCode());
+				e1 = e1.getNextException();
+			}
+		}
 	}
 
 	/*This should display messages in the same fashion as the previous task except that only those
@@ -338,8 +356,7 @@ logout in the profile relation,*/
 
 	}
 
-	//Perform tests for the functions
-	public void closeDB()
+	public void closeDB() throws SQLException
 	{
 		//Close the connection
 		dbcon.close();
