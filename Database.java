@@ -1,5 +1,7 @@
 import java.sql.*;
 import java.util.*;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 
 public class Database
 {
@@ -74,7 +76,7 @@ public class Database
 				st3.setString(1, userID);
 				thisUserID = userID;
 				ResultSet res = st3.executeQuery();
-				result.next();
+				res.next();
 				last_login = res.getTimestamp("lastlogin");
 
 				return true;
@@ -86,7 +88,7 @@ public class Database
 		}
 		catch(SQLException e1)
 		{
-			System.out.println("SQL Error");
+			System.out.println("SQL Error in loginUser method");
 			while(e1 != null)
 			{
 				System.out.println("Message = "+ e1.getMessage());
@@ -104,11 +106,20 @@ public class Database
 	//should be prompted to enter a message to be sent along with the request. A last confirmation
 	//should be requested of the user before an entry is inserted into the pendingFriends relation,
 	//and success or failure feedback is displayed for the user.
+
 	public boolean initiateFriendship(String fromID, String toID)
+	{
+		//Using method overload here to have a version of this method that
+		//can be easily tested
+		return initiateFriendship(fromID, toID, System.in);
+	}
+
+	//Allows us to feed an inputstream into this method so that we can automate the tests
+	public boolean initiateFriendship(String fromID, String toID, InputStream in)
 	{
 		//Get a message from the user
 		System.out.println("Sending a request to " + toID);
-		Scanner scan = new Scanner(System.in);
+		Scanner scan = new Scanner(in);
 		System.out.println("Enter a message for your friendrequest:");
 		String msg = scan.nextLine();
 
