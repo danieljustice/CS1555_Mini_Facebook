@@ -56,6 +56,7 @@ CREATE TABLE groups(
 	gID				varchar2(20) not null,
 	name			varchar2(50),
 	description		varchar2(200),
+	max_members 	number,
 	CONSTRAINT groups_ID PRIMARY KEY (gID)
 );
 
