@@ -5,6 +5,7 @@ import java.sql.*;
 
 public class TestDriver
 {
+	public static Database db;
 	public static void main(String args[]) throws SQLException
 	{
 		Scanner scan = new Scanner(System.in);
@@ -12,7 +13,7 @@ public class TestDriver
 		String username = scan.nextLine();
 		System.out.println("Enter your Oracle password:");
 		String password = scan.nextLine();
-		Database db = null;
+		
 		try
 		{
 			db = new Database(username, password);
@@ -23,9 +24,7 @@ public class TestDriver
 			System.exit(0);
 		}
 
-		//Test user creation
-		db.createUser("695", "John", "slfslj", "5-May-1987", "yy220@pitt.edu");
-		System.out.println("Successfully created new user");
+		runTestSuite();
 
 		//Test login
 		if(db.loginUser("695", "slfslj"))
@@ -37,5 +36,19 @@ public class TestDriver
 		db.initiateFriendship("1", "695");
 
 		db.closeDB();
+	}
+
+	public static void runTestSuite(){
+		testCreatingUser();
+	}
+
+	public static void testCreatingUser(){
+		System.out.println("Start Creating User Test");
+		db.deleteUser("695");
+		System.out.println("Deleted User");
+		//Test user creation
+		db.createUser("695", "John", "slfslj", "5-May-1987", "yy220@pitt.edu");
+		System.out.println("Successfully created new user");
+		System.out.println("End Creating User Test");
 	}
 }
