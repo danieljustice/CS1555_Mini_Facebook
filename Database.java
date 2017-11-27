@@ -4,6 +4,7 @@ import java.util.*;
 public class Database
 {
 	private Connection dbcon;
+	private Timestamp last_login;
 
 	//Client must ask for user and password themselves
 	public Database(String username, String password) throws SQLException
@@ -63,11 +64,18 @@ public class Database
 			//Compare the password with what's given
 			if(password.equals(pw))
 			{
+				//Save the last login time for future use
+				PreparedStatement st3 = dbcon.prepareStatement("SELECT lastlogin FROM profile WHERE userID = ?");
+				st3.setString(1, userID);
+				ResultSet res = st3.executeQuery();
+				result.next();
+				last_login = res.getTimestamp(lastlogin);
+
 				//Fix so it can add proper date
 				/*PreparedStatement st2 = dbcon.prepareStatement("UPDATE profile SET lastlogin = TO_TIMESTAMP(?, 'YYYY-MM-DD HH24:MI:SS') WHERE userID = ?");
-				st2.setString(1, new SimpleDateFormat("YYYY-MM-DD HH24:MM:SS").format(new Date()));
+				st2.setTimestamp(1, new java.util.Date());
 				st2.setString(2, userID);
-				st2.executeUpdatey();*/
+				st2.executeUpdate();*/
 				return true;
 			}
 			else
@@ -102,6 +110,8 @@ public class Database
 		Scanner scan = new Scanner(System.in);
 		System.out.println("Enter a message for your friendrequest:");
 		String msg = scan.nextLine();
+
+		//Get the name of the person to request to
 
 		//Confirm request
 		System.out.println("Are you sure you want to send a request to " + toID + "?");
@@ -153,6 +163,22 @@ public class Database
 	//selected are declined and removed from pendingFriends and pendingGroupmembers relations.
 	public void confirmFriendship()
 	{
+		try
+		{
+
+		}
+		catch(SQLException e1)
+		{
+			//Print errors
+			System.out.println("SQL Error");
+			while(e1 != null)
+			{
+				System.out.println("Message = "+ e1.getMessage());
+				System.out.println("SQLState = "+ e1.getSQLState());
+				System.out.println("SQLState = "+ e1.getErrorCode());
+				e1 = e1.getNextException();
+			}
+		}
 
 	}
 
@@ -298,6 +324,12 @@ public class Database
 			ResultSet results = st1.executeQuery();
 
 			//Loop through and display the results
+			while(results.next())
+			{
+				System.out.println("From " + results.getString("fromID"));
+				System.out.println("Sent " + results.getDate("dateSent"));
+				System.out.println(results.getString("message"));
+			}
 		}
 		catch(SQLException e1)
 		{
@@ -314,9 +346,35 @@ public class Database
 
 	/*This should display messages in the same fashion as the previous task except that only those
 	messages sent since the last time the user logged into the system should be displayed.*/
-	public void displayNewMessages()
+	public void displayNewMessages(String userID)
 	{
+		try
+		{
+			//Get all messages sent to the user since last login time
+			PreparedStatement st1 = dbcon.prepareStatement("SELECT fromID, message, dateSent FROM messages WHERE toUserID = ? and dateSent > ? ORDER BY dateSent DESC");
+			st1.setString(1, userID);
+			st2.setTimestamp(2, last_login);
+			ResultSet results = st1.executeQuery();
 
+			//Loop through and display results
+			while(results.next())
+			{
+				System.out.println("From " + results.getString("fromID"));
+				System.out.println("Sent " + results.getDate("dateSent"));
+				System.out.println(results.getString("message"));
+			}
+		}
+		catch(SQLException e1)
+		{
+			System.out.println("SQL Error");
+			while(e1 != null)
+			{
+				System.out.println("Message = "+ e1.getMessage());
+				System.out.println("SQLState = "+ e1.getSQLState());
+				System.out.println("SQLState = "+ e1.getErrorCode());
+				e1 = e1.getNextException();
+			}
+		}
 	}
 
 	/*Given a string on which to match any user in the system, any item in this string must be
@@ -337,7 +395,7 @@ public class Database
 
 	/*Display top K who have sent to received the highest number of messages during for the past x
 	months. x and K are input parameters to this function.*/
-	public void topMessages()
+	public void topMessages(int k, int months)
 	{
 
 	}
@@ -347,16 +405,33 @@ public class Database
 	messages require special handling because they are owned by both sender and receiver. Therefore,
 	a message is deleted only when both he sender and all receivers are deleted. Attention
 	should be paid handling integrity constraints.*/
-	public void dropUser()
+	public void dropUser(String userID)
 	{
-
+		try
+		{
+			//Have triggers handle the details of this
+			PreparedStatement st1 = dbcon.prepareStatement("DELETE FROM profile WHERE userID = ?");
+			st1.setString(1, userID);
+			st1.executeUpdate();
+		}
+		catch(SQLException e1)
+		{
+			System.out.println("SQL Error");
+			while(e1 != null)
+			{
+				System.out.println("Message = "+ e1.getMessage());
+				System.out.println("SQLState = "+ e1.getSQLState());
+				System.out.println("SQLState = "+ e1.getErrorCode());
+				e1 = e1.getNextException();
+			}
+		}
 	}
 
 	/*This option should cleanly shut down and exit the program after marking the time of the user's
 logout in the profile relation,*/
 	public void Logout()
 	{
-
+		closeDB();
 	}
 
 	public void closeDB() throws SQLException
