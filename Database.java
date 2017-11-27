@@ -431,11 +431,34 @@ public class Database
 	matched against any significant field of a user's profile. That is if the user searches for 'xyz
 	abc', the results should be the set of all profiles that match 'xyz' union the set of all profiles
 	that matches 'abc'*/
-	public void searchForUser()
+	public void searchForUser(String request)
 	{
 		try
 		{
-			PreparedStatement st1 = dbcon.prepareStatement("this is a place holder");
+			//Tokenize the input
+			ArrayList<String> list = new ArrayList<String>();
+			StringTokenizer st = new StringTokenizer(request);
+			while(st.hasMoreTokens())
+			{
+				list.add(st.nextToken());
+			}
+
+			//Prepare the query
+			PreparedStatement st1 = dbcon.prepareStatement("SELECT userID, name FROM profile WHERE name LIKE ?");
+
+			//Loop over tokens
+			for(int i = 0; i < list.size(); i++)
+			{
+				st1.setString(1, list.get(i));
+				ResultSet results = st1.executeQuery();
+
+				//Print results of each set
+				while(results.next())
+				{
+					System.out.println("Name: " + results.getString("name"));
+					System.out.println("userID: " + results.getString("userID") + "\n");
+				}
+			}
 		}
 		catch(SQLException e1)
 		{
@@ -453,7 +476,7 @@ public class Database
 
 	/*Given two users (A and B), find a path, if one exists, between A and B with at most 3 hop
 	between them. A hop is defined as a friendship between any two users.*/
-	public void threeDegrees()
+	public void threeDegrees(String userID1, String userID2)
 	{
 		try
 		{
@@ -475,11 +498,31 @@ public class Database
 
 	/*Display top K who have sent to received the highest number of messages during for the past x
 	months. x and K are input parameters to this function.*/
-	public void topMessages(int k, int months)
+	public void topMessages(int k, int x)
 	{
 		try
 		{
-			PreparedStatement st1 = dbcon.prepareStatement("this is a place holder");
+			//Set up the query
+			PreparedStatement st1 = dbcon.prepareStatement("SELECT * FROM "
+														+ "(SELECT toUserID, COUNT(msgId) as mCount from messages WHERE dateSent >= ? GROUP BY toUserID, mCount ORDER BY mCount DESC) "
+														+ "WHERE rownum <= ? ORDER BY rownum");
+			st1.setInt(2, k);
+			
+			//Calculate the date from which to get the messages from
+			Calendar current = new Calendar();
+			current.add(Calendar.MONTH, -x);
+			java.sql.Date date = new java.sql.Date(current.get(Calendar.YEAR), current.get(Calendar.MONTH), current.get(Calendar.DAY));
+			st1.setDate(1, current);
+			ResultSet result = st1.executeQuery();
+
+			//Display the results
+			System.out.println("Top " + k + " messaged users in the past " + x + " months:");
+			int i = 1;
+			while(result.next())
+			{
+				System.out.println(i + ".\t" + results.getString("toUserID") + ": " + results.getInt("mCount"));
+				i++;
+			}
 		}
 		catch(SQLException e1)
 		{
