@@ -72,10 +72,9 @@ public class Database
 				last_login = res.getTimestamp(lastlogin);
 
 				//Fix so it can add proper date
-				/*PreparedStatement st2 = dbcon.prepareStatement("UPDATE profile SET lastlogin = TO_TIMESTAMP(?, 'YYYY-MM-DD HH24:MI:SS') WHERE userID = ?");
-				st2.setTimestamp(1, new java.util.Date());
-				st2.setString(2, userID);
-				st2.executeUpdate();*/
+				PreparedStatement st2 = dbcon.prepareStatement("UPDATE profile SET lastlogin = TO_TIMESTAMP(CURRENT_TIMESTAMP, 'YYYY-MM-DD HH24:MI:SS') WHERE userID = ?");
+				st2.setString(1, userID);
+				st2.executeUpdate();
 				return true;
 			}
 			else
@@ -296,12 +295,11 @@ public class Database
 
 		try
 		{
-			PreparedStatement st1 = dbcon.prepareStatement("INSERT INTO messages values(?, ?, ?, ?, NULL, ?)");
+			PreparedStatement st1 = dbcon.prepareStatement("INSERT INTO messages values(?, ?, ?, ?, NULL, GETDATE())");
 			//Not sure how to determine message ID
 			st1.setString(2, fromID);
 			st1.setString(3, msg);
 			st1.setString(4, toID);
-			//Not sure of how to get the current date
 			st1.executeUpdate();
 
 			System.out.println("Sent successfully");
