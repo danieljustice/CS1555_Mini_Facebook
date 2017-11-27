@@ -30,11 +30,12 @@ public class Database
 			st1.setString(3, password);
 			st1.setString(4, dob);
 			st1.setString(5, email);
-			st1.executeUpdate();
+			int woot = st1.executeUpdate();
+			System.out.println(woot);
 		}
 		catch(SQLException e1)
 		{
-			System.out.println("SQL Error");
+			System.out.println("SQL Error in createUser method");
 			while(e1 != null)
 			{
 				System.out.println("Message = "+ e1.getMessage());
@@ -45,6 +46,32 @@ public class Database
 		}
 	}
 
+
+
+
+	public void deleteUser(String userID){
+		try
+		{
+			System.out.println("RAWR");
+			PreparedStatement st1 = dbcon.prepareStatement("DELETE FROM profile WHERE userID = ?");
+			System.out.println("RAWR1");
+			st1.setString(1, userID);
+			System.out.println("RAWR2");
+			int woot = st1.executeUpdate();
+			System.out.println(woot);
+		}
+		catch(SQLException e1)
+		{
+			System.out.println("SQL Error in deleteUser method");
+			while(e1 != null)
+			{
+				System.out.println("Message = "+ e1.getMessage());
+				System.out.println("SQLState = "+ e1.getSQLState());
+				System.out.println("SQLState = "+ e1.getErrorCode());
+				e1 = e1.getNextException();
+			}
+		}
+	}
 	//Given userID and password, login as the user in the system when an appropriate match is
 	//found
 	//Return true if logged in successfully, false otherwise
@@ -69,7 +96,7 @@ public class Database
 				st3.setString(1, userID);
 				ResultSet res = st3.executeQuery();
 				result.next();
-				last_login = res.getTimestamp(lastlogin);
+				last_login = res.getTimestamp("lastlogin");
 
 				//Fix so it can add proper date
 				PreparedStatement st2 = dbcon.prepareStatement("UPDATE profile SET lastlogin = TO_TIMESTAMP(CURRENT_TIMESTAMP, 'YYYY-MM-DD HH24:MI:SS') WHERE userID = ?");
@@ -167,7 +194,7 @@ public class Database
 			//Search for friend requests to confirm
 			PreparedStatement st1 = dbcon.prepareStatement("SELECT fromID, message FROM pendingFriends WHERE toID = ?");
 			st1.setString(1, userID);
-			ResultSet friends = dbcon.executeQuery();
+			ResultSet friends = st1.executeQuery();
 
 			//Search for group requests to confirm
 			//Display the results
@@ -200,7 +227,7 @@ public class Database
 	{
 		try
 		{
-
+			PreparedStatement st1 = dbcon.prepareStatement("this is a place holder");
 		}
 		catch(SQLException e1)
 		{
@@ -333,7 +360,7 @@ public class Database
 	{
 		try
 		{
-
+			PreparedStatement st1 = dbcon.prepareStatement("this is a place holder");
 		}
 		catch(SQLException e1)
 		{
@@ -390,7 +417,7 @@ public class Database
 			//Get all messages sent to the user since last login time
 			PreparedStatement st1 = dbcon.prepareStatement("SELECT fromID, message, dateSent FROM messages WHERE toUserID = ? and dateSent > ? ORDER BY dateSent DESC");
 			st1.setString(1, userID);
-			st2.setTimestamp(2, last_login);
+			st1.setTimestamp(2, last_login);
 			ResultSet results = st1.executeQuery();
 
 			//Loop through and display results
@@ -422,7 +449,7 @@ public class Database
 	{
 		try
 		{
-
+			PreparedStatement st1 = dbcon.prepareStatement("this is a place holder");
 		}
 		catch(SQLException e1)
 		{
@@ -444,7 +471,7 @@ public class Database
 	{
 		try
 		{
-
+			PreparedStatement st1 = dbcon.prepareStatement("this is a place holder");
 		}
 		catch(SQLException e1)
 		{
@@ -466,7 +493,7 @@ public class Database
 	{
 		try
 		{
-
+			PreparedStatement st1 = dbcon.prepareStatement("this is a place holder");
 		}
 		catch(SQLException e1)
 		{
@@ -516,9 +543,23 @@ logout in the profile relation,*/
 		closeDB();
 	}
 
-	public void closeDB() throws SQLException
+	public void closeDB()
 	{
 		//Close the connection
-		dbcon.close();
+		try {
+			dbcon.close();
+		} 		
+		catch(SQLException e1)
+		{
+			System.out.println("SQL Error");
+			while(e1 != null)
+			{
+				System.out.println("Message = "+ e1.getMessage());
+				System.out.println("SQLState = "+ e1.getSQLState());
+				System.out.println("SQLState = "+ e1.getErrorCode());
+				e1 = e1.getNextException();
+			}
+		}
+		
 	}
 }
