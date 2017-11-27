@@ -161,11 +161,20 @@ public class Database
 	//should move the request from the appropriate pendingFriends or pendingGroupmembers
 	//relation to the friends or groupMembership relation. The remaining requests which were not
 	//selected are declined and removed from pendingFriends and pendingGroupmembers relations.
-	public void confirmFriendship()
+	public void confirmFriendship(String userID)
 	{
 		try
 		{
+			//Search for friend requests to confirm
+			PreparedStatement st1 = dbcon.prepareStatement("SELECT fromID, message FROM pendingFriends WHERE toID = ?");
+			st1.setString(1, userID);
+			ResultSet friends = dbcon.executeQuery();
 
+			//Search for group requests to confirm
+			//Display the results
+			//Ask which requests to confirm
+			//Move those requests to the appropriate place
+			//Delete the others
 		}
 		catch(SQLException e1)
 		{
@@ -190,7 +199,22 @@ public class Database
 	prompted to either select to retrieve another friend's profile or return to the main menu.*/
 	public void displayFriends()
 	{
+		try
+		{
 
+		}
+		catch(SQLException e1)
+		{
+			//Print errors
+			System.out.println("SQL Error");
+			while(e1 != null)
+			{
+				System.out.println("Message = "+ e1.getMessage());
+				System.out.println("SQLState = "+ e1.getSQLState());
+				System.out.println("SQLState = "+ e1.getErrorCode());
+				e1 = e1.getNextException();
+			}
+		}
 	}
 
 	/*Given a name, description, and membership limit, add a new group to the system, add the
@@ -309,7 +333,22 @@ public class Database
 	relation.*/
 	public void sendMessageToGroup()
 	{
+		try
+		{
 
+		}
+		catch(SQLException e1)
+		{
+			//Print errors
+			System.out.println("SQL Error");
+			while(e1 != null)
+			{
+				System.out.println("Message = "+ e1.getMessage());
+				System.out.println("SQLState = "+ e1.getSQLState());
+				System.out.println("SQLState = "+ e1.getErrorCode());
+				e1 = e1.getNextException();
+			}
+		}
 	}
 
 	/*When the user selects this option, the entire contents of every message sent to the user should
@@ -383,21 +422,66 @@ public class Database
 	that matches 'abc'*/
 	public void searchForUser()
 	{
+		try
+		{
 
+		}
+		catch(SQLException e1)
+		{
+			//Print errors
+			System.out.println("SQL Error");
+			while(e1 != null)
+			{
+				System.out.println("Message = "+ e1.getMessage());
+				System.out.println("SQLState = "+ e1.getSQLState());
+				System.out.println("SQLState = "+ e1.getErrorCode());
+				e1 = e1.getNextException();
+			}
+		}
 	}
 
 	/*Given two users (A and B), find a path, if one exists, between A and B with at most 3 hop
 	between them. A hop is defined as a friendship between any two users.*/
 	public void threeDegrees()
 	{
+		try
+		{
 
+		}
+		catch(SQLException e1)
+		{
+			//Print errors
+			System.out.println("SQL Error");
+			while(e1 != null)
+			{
+				System.out.println("Message = "+ e1.getMessage());
+				System.out.println("SQLState = "+ e1.getSQLState());
+				System.out.println("SQLState = "+ e1.getErrorCode());
+				e1 = e1.getNextException();
+			}
+		}
 	}
 
 	/*Display top K who have sent to received the highest number of messages during for the past x
 	months. x and K are input parameters to this function.*/
 	public void topMessages(int k, int months)
 	{
+		try
+		{
 
+		}
+		catch(SQLException e1)
+		{
+			//Print errors
+			System.out.println("SQL Error");
+			while(e1 != null)
+			{
+				System.out.println("Message = "+ e1.getMessage());
+				System.out.println("SQLState = "+ e1.getSQLState());
+				System.out.println("SQLState = "+ e1.getErrorCode());
+				e1 = e1.getNextException();
+			}
+		}
 	}
 
 	/*Remove a user and all of their information from the system. When a user is removed, the system
