@@ -1,6 +1,7 @@
 //Test Driver program for Database.java
 
 import java.util.*;
+import java.io.ByteArrayInputStream;
 import java.sql.*;
 
 public class TestDriver
@@ -26,31 +27,51 @@ public class TestDriver
 
 		runTestSuite();
 
-		//Test login
-		if(db.loginUser("695", "slfslj"))
-			System.out.println("Logged in");
-		else
-			System.out.println("Not logged in");
+		// //Test login
+		// if(db.loginUser("695", "slfslj"))
+		// 	System.out.println("Logged in");
+		// else
+		// 	System.out.println("Not logged in");
 
 		//Test friend request generation
-		db.initiateFriendship("1", "695");
+		//db.initiateFriendship("1", "695");
 
 		db.closeDB();
 	}
 
 	public static void runTestSuite(){
 		testCreatingUser();
+		testLoginUser();
+		testInitiateFriendship();
 	}
 
 	public static void testCreatingUser(){
 		// db.dropUser("1");
 		// System.out.println("Deleted User");
 		//Test user creation
-		int success = db.createUser("696", "John", "slfslj", "5-May-1987", "yy220@pitt.edu");
-		if(answer < 0){
+		int success = db.createUser("695", "John", "slfslj", "5-May-1987", "yy220@pitt.edu");
+		if(success < 0){
 			System.out.println("testCreatingUser - FAILED");
 		}else{
 			System.out.println("testCreatingUser - Passed");
+		}
+	}
+
+	public static void testLoginUser(){
+		//Test login
+		if(db.loginUser("695", "slfslj"))
+			System.out.println("testLoginUser - Passed");
+		else
+			System.out.println("testLoginUser - FAILED");
+	}
+
+	public static void testInitiateFriendship(){
+		ByteArrayInputStream in  =  new ByteArrayInputStream("My string\nyes\n".getBytes());
+		boolean success = db.initiateFriendship("1", "695", in);
+		if(success){
+			System.out.println("testInitiateFriendship - Passed");
+		}else{
+			System.out.println("testInitiateFriendship - FAILED");
 		}
 	}
 }
