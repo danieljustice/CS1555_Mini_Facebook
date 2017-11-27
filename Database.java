@@ -5,7 +5,7 @@ public class Database
 {
 	private Connection dbcon;
 	private Timestamp last_login;
-
+	private String thisUserID;
 	//Client must ask for user and password themselves
 	public Database(String username, String password) throws SQLException
 	{
@@ -19,9 +19,11 @@ public class Database
 
 	//Given a name, email address, and date of birth, add a new user to the system by inserting as
 	//new entry in the profile relation.
-	public void createUser(String userID, String name, String password, String dob, String email)
+	public int createUser(String userID, String name, String password, String dob, String email)
 	{	
 		//Add something to convert the date to a timestamp
+		//success will be returned at end of method, -1 for fail, 0 or greater for success
+		int success = -1;
 		try
 		{
 			PreparedStatement st1 = dbcon.prepareStatement("INSERT INTO profile values(?, ?, ?, ?, NULL, ?)");
@@ -30,8 +32,7 @@ public class Database
 			st1.setString(3, password);
 			st1.setString(4, dob);
 			st1.setString(5, email);
-			int woot = st1.executeUpdate();
-			System.out.println(woot);
+			success = st1.executeUpdate();
 		}
 		catch(SQLException e1)
 		{
@@ -44,34 +45,11 @@ public class Database
 				e1 = e1.getNextException();
 			}
 		}
+		return success;
 	}
 
 
 
-
-	public void deleteUser(String userID){
-		try
-		{
-			System.out.println("RAWR");
-			PreparedStatement st1 = dbcon.prepareStatement("DELETE FROM profile WHERE userID = ?");
-			System.out.println("RAWR1");
-			st1.setString(1, userID);
-			System.out.println("RAWR2");
-			int woot = st1.executeUpdate();
-			System.out.println(woot);
-		}
-		catch(SQLException e1)
-		{
-			System.out.println("SQL Error in deleteUser method");
-			while(e1 != null)
-			{
-				System.out.println("Message = "+ e1.getMessage());
-				System.out.println("SQLState = "+ e1.getSQLState());
-				System.out.println("SQLState = "+ e1.getErrorCode());
-				e1 = e1.getNextException();
-			}
-		}
-	}
 	//Given userID and password, login as the user in the system when an appropriate match is
 	//found
 	//Return true if logged in successfully, false otherwise
@@ -94,14 +72,11 @@ public class Database
 				//Save the last login time for future use
 				PreparedStatement st3 = dbcon.prepareStatement("SELECT lastlogin FROM profile WHERE userID = ?");
 				st3.setString(1, userID);
+				thisUserID = userID;
 				ResultSet res = st3.executeQuery();
 				result.next();
 				last_login = res.getTimestamp("lastlogin");
 
-				//Fix so it can add proper date
-				PreparedStatement st2 = dbcon.prepareStatement("UPDATE profile SET lastlogin = TO_TIMESTAMP(CURRENT_TIMESTAMP, 'YYYY-MM-DD HH24:MI:SS') WHERE userID = ?");
-				st2.setString(1, userID);
-				st2.executeUpdate();
 				return true;
 			}
 			else
@@ -540,7 +515,27 @@ public class Database
 logout in the profile relation,*/
 	public void Logout()
 	{
-		closeDB();
+		//Fix so it can add proper date
+
+		try
+		{
+			PreparedStatement st2 = dbcon.prepareStatement("UPDATE profile SET lastlogin = TO_TIMESTAMP(CURRENT_TIMESTAMP, 'YYYY-MM-DD HH24:MI:SS') WHERE userID = ?");
+			st2.setString(1, thisUserID);
+			st2.executeUpdate();
+			closeDB();
+		}
+		catch(SQLException e1)
+		{
+			//Print errors
+			System.out.println("SQL Error");
+			while(e1 != null)
+			{
+				System.out.println("Message = "+ e1.getMessage());
+				System.out.println("SQLState = "+ e1.getSQLState());
+				System.out.println("SQLState = "+ e1.getErrorCode());
+				e1 = e1.getNextException();
+			}
+		}
 	}
 
 	public void closeDB()

@@ -43,12 +43,14 @@ public class TestDriver
 	}
 
 	public static void testCreatingUser(){
-		System.out.println("Start Creating User Test");
-		db.deleteUser("695");
-		System.out.println("Deleted User");
+		// db.dropUser("1");
+		// System.out.println("Deleted User");
 		//Test user creation
-		db.createUser("695", "John", "slfslj", "5-May-1987", "yy220@pitt.edu");
-		System.out.println("Successfully created new user");
-		System.out.println("End Creating User Test");
+		int success = db.createUser("696", "John", "slfslj", "5-May-1987", "yy220@pitt.edu");
+		if(answer < 0){
+			System.out.println("testCreatingUser - FAILED");
+		}else{
+			System.out.println("testCreatingUser - Passed");
+		}
 	}
 }
