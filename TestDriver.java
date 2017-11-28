@@ -27,15 +27,6 @@ public class TestDriver
 
 		runTestSuite();
 
-		// //Test login
-		// if(db.loginUser("695", "slfslj"))
-		// 	System.out.println("Logged in");
-		// else
-		// 	System.out.println("Not logged in");
-
-		//Test friend request generation
-		//db.initiateFriendship("1", "695");
-
 		db.closeDB();
 	}
 

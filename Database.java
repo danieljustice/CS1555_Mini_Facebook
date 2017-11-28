@@ -150,7 +150,7 @@ public class Database
 			catch(SQLException e1)
 			{
 				//Print errors
-				System.out.println("SQL Error");
+				System.out.println("SQL Error in initiateFriendship");
 				while(e1 != null)
 				{
 					System.out.println("Message = "+ e1.getMessage());
