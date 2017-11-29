@@ -446,6 +446,8 @@ public class Database
 			//Prepare the query
 			PreparedStatement st1 = dbcon.prepareStatement("SELECT userID, name FROM profile WHERE name LIKE ?");
 
+			System.out.println("Here are your results:");
+
 			//Loop over tokens
 			for(int i = 0; i < list.size(); i++)
 			{
@@ -480,7 +482,25 @@ public class Database
 	{
 		try
 		{
-			PreparedStatement st1 = dbcon.prepareStatement("this is a place holder");
+			//PreparedStatement st1 = dbcon.prepareStatement("SELECT * FROM ");
+			
+			//Call the recursive helper method
+			ArrayList<String> results = new ArrayList<String>();
+			ArrayList<String> path = tresDegrees(userID1, userID2, results);
+
+			//Print the results
+			if(path == null)
+				System.out.println("No path was found between " + userID1 + " and " + userID2);
+			else
+			{
+				for(int i = 0; i < path.size(); i++)
+				{
+					if(i != path.size() - 1)
+						System.out.print(path.get(i) + "->");
+					else
+						System.out.println(path.get(i));
+				}
+			}
 		}
 		catch(SQLException e1)
 		{
@@ -612,5 +632,66 @@ logout in the profile relation,*/
 			}
 		}
 		
+	}
+
+	//Recursive helper member find paths for the threeDegrees method
+	//Returns null if no path is found, otherwise returns the path in the form of an ArrayList of strings
+	private ArrayList<String> tresDegrees(String userID1, String userID2, ArrayList<String> results)
+	{
+		try
+		{
+			//Get the friends of userID1
+			if(results.size() =< 4)
+			{
+				results.add(userID1);
+				PreparedStatement st1 = dbcon.prepareStatement("SELECT userID1, userID2 FROM friends WHERE userID1 = ? OR userID2 = ?");
+				st1.setString(1, userID1);
+				st1.setString(2, userID1);
+				ResultSet friends = st1.executeQuery();
+
+				//Scan the results to check if userID2 if found
+				while(friends.next())
+				{
+					if(userID2.equals(friends.getString("userID1")) || userID2.equals(friends.getString("userID2")))
+						return results.add(userID2);
+				}
+
+				//UserID2 was not found, so recursively check the next level of friends
+				friends.beforeFirst();
+				ArrayList<String> path = new ArrayList<String>();
+				while(friends.next())
+				{
+					if(userID1.equals(friends.getString("userID1")))
+						path = tresDegrees(friends.getString("userID2"), userID2, results);
+					else
+						path = tresDegrees(friends.getString("userID1"), userID2, results);
+					if(path != null)
+						break;
+				}
+
+				//Return the path if found
+				if(path != null)
+					return path;
+				//Else, no path exists from this friend and delete him from the path
+				else
+				{
+					results.remove(size() - 1);
+					return null;
+				}
+			}
+			else
+				return null;
+		}
+		catch(SQLException e1)
+		{
+			System.out.println("SQL Error");
+			while(e1 != null)
+			{
+				System.out.println("Message = "+ e1.getMessage());
+				System.out.println("SQLState = "+ e1.getSQLState());
+				System.out.println("SQLState = "+ e1.getErrorCode());
+				e1 = e1.getNextException();
+			}
+		}
 	}
 }
