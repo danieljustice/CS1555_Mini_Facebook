@@ -52,32 +52,36 @@ CREATE TABLE pendingFriends(
 	CONSTRAINT pendindingFriends_id_check CHECK (fromID <> toID)
 );
 
+--gID changed from varchar2(20)
 CREATE TABLE groups(
-	gID				varchar2(20) not null,
+	gID				number not null,
 	name			varchar2(50),
 	description		varchar2(200),
 	max_members 	number,
 	CONSTRAINT groups_ID PRIMARY KEY (gID)
 );
 
+--msgID, toGroupID changed from varchar2(20)
 --Assume a user cannot send a message to themselves
 CREATE TABLE messages(
-	msgID varchar2(20) not null,
+	msgID number not null,
 	fromID varchar2(20),
 	message varchar2(200),
 	toUserID varchar2(20),
-	toGroupID varchar2(20),
+	toGroupID number,
 	dateSent date,
 	CONSTRAINT messages_pk PRIMARY KEY (msgID),
-	CONSTRAINT messages_fk1 FOREIGN KEY (toUserID) REFERENCES profile(userID) ON DELETE CASCADE,
+	CONSTRAINT messages_fk1 FOREIGN KEY (toUserID) REFERENCES profile(userID),
 	CONSTRAINT messages_fk2 FOREIGN KEY (toGroupID) REFERENCES groups(gID) ON DELETE CASCADE,
+	CONSTRAINT messages_fk3 FOREIGN KEY (fromID) REFERENCES profile(userID),
 	CONSTRAINT messages_selfsend_check CHECK (fromID <> toUserID));
 
 ALTER TABLE messages modify toGroupID default null;
 ALTER TABLE messages modify toUserID default null;
 
+--msgID changed from varchar2(20)
 CREATE TABLE messageRecipient(
-	msgID			varchar2(20) not null,
+	msgID			number not null,
 	userID			varchar2(20) not null,
 	CONSTRAINT messageRecipient_pk PRIMARY KEY (msgID, userID),
 	CONSTRAINT messageRecipient_fk1 FOREIGN KEY (msgID) REFERENCES messages(msgID) ON DELETE CASCADE,
@@ -85,8 +89,9 @@ CREATE TABLE messageRecipient(
 );
 
 --Assume a group member only has one role
+--gID changed from varchar2(20)
 CREATE TABLE groupMembership(
-	gID				varchar2(20) not null,
+	gID				number not null,
 	--user that is a part of the group
 	userID			varchar2(20) not null,
 	--roles are manager or member
@@ -99,8 +104,9 @@ CREATE TABLE groupMembership(
 );
 
 --Assume the message is tied to the membership request and is not sent to an individual
+--gID changed from varchar(20)
 CREATE TABLE pendingGroupmembers(
-	gID				varchar2(20) not null,
+	gID				number not null,
 	--user who wants to joing the group
 	userID			varchar2(20) not null,
 	message 		varchar2(200),

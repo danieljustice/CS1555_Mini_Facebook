@@ -209,11 +209,53 @@ public class Database
 	userID or exit browsing and return to the main menu by entering 0 as a userID. When selected,
 	a friend's profile should be displayed in a nicely formatted way, after which the user should be
 	prompted to either select to retrieve another friend's profile or return to the main menu.*/
-	public void displayFriends()
+	public void displayFriends(String userID)
 	{
 		try
 		{
-			PreparedStatement st1 = dbcon.prepareStatement("this is a place holder");
+			//Get all the friends of the user
+			PreparedStatement st1 = dbcon.prepareStatement("SELECT userID1, userID2, name FROM "
+															+ "(friends JOIN profile ON (((userID1 = userID) and (userID1 <> ?)) or ((userID2 = userID) and (userID2 <> ?)))"
+															+ "WHERE userID1 = ? OR userID2 = ?");
+			PreparedStatement st2 = dbcon.prepareStatement("SELECT userID, name, date_of_birth, email FROM profile WHERE userID = ?");
+
+			st1.setString(1, userID);
+			st1.setString(2, userID);
+			st1.setString(3, userID);
+			st1.setString(4, userID);
+			ResultSet friends = st1.executeQuery();
+
+			//Display the friends
+			System.out.println("Your friends:");
+			while(friends.next())
+			{
+				if(userID.equalsIgnoreCase(friends.getString("userID1")))
+					System.out.println("Name: " + friends.getString("name") + ", " + friends.getString("userID2"));
+				else
+					System.out.println("Name: " + friends.getString("name") + ", " + friends.getString("userID1"));
+			}
+
+			//Menu to request profiles
+			Scanner scan = new Scanner(System.in);
+			System.out.println("Enter a profileID to request a profile(enter 0 to exit):");
+			String input = scan.nextLine();
+
+			while(!input.equals("0"))
+			{
+				//Get the profile
+				st2.setString(1, input);
+				ResultSet results = st2.executeQuery();
+
+				//Display the results
+				System.out.println("Name: " + results.getString("name"));
+				System.out.println("userID: " + results.getString("userID"));
+				System.out.println("email: " + results.getString("email"));
+				System.out.println("Date of Birth:" + results.getDate("date_of_birth") + "\n");
+
+				//Ask for input
+				System.out.println("Enter a profileID to request a profile(enter 0 to exit):");
+				input = scan.nextLine();
+			}
 		}
 		catch(SQLException e1)
 		{
@@ -239,6 +281,12 @@ public class Database
 			PreparedStatement st2 = dbcon.prepareStatement("INSERT INTO groupMembership values(?, ?, 'manager')");
 
 			//Not sure how to determine gID
+			PreparedStatement st3 = dbcon("SELECT MAX(gID) AS max FROM groups");
+			ResultSet gID = st3.executeQuery();
+			if(gID.next())
+				st1.setInt(1, gID.getInt("max"));
+			else
+				st1.setInt(1, 1);
 			st1.setString(2, name);
 			st1.setString(3, desc);
 			st1.executeUpdate();
@@ -310,6 +358,12 @@ public class Database
 		{
 			PreparedStatement st1 = dbcon.prepareStatement("INSERT INTO messages values(?, ?, ?, ?, NULL, GETDATE())");
 			//Not sure how to determine message ID
+			PreparedStatement st2 = dbcon.PreparedStatement("SELECT MAX(msgID) as max FROM messages");
+			ResultSet id = st2.executeQuery();
+			if(id.next)
+				st1.setInt(1, id.getInt("max"));
+			else
+				st1.setInt(1, 1);
 			st1.setString(2, fromID);
 			st1.setString(3, msg);
 			st1.setString(4, toID);
@@ -342,11 +396,51 @@ public class Database
 	to put the group ID to ToGroupID in the table of messages and use a trigger to populate the
 	messageRecipient table with proper user ID information as defined by the groupMembership
 	relation.*/
-	public void sendMessageToGroup()
+	public void sendMessageToGroup(String userID, String toGroupID)
 	{
 		try
 		{
-			PreparedStatement st1 = dbcon.prepareStatement("this is a place holder");
+			//Ask for the message
+			Scanner scan = new Scanner(System.in);
+			System.out.println("Please enter your message: ");
+			String msg = scan.nextLine();
+
+			//First check if the user is in the group
+			PreparedStatement st1 = dbcon.prepareStatement("SELECT gID FROM groupMembership WHERE userID = ?");
+			st1.setString(1, userID);
+			ResultSet groups = st1.executeQuery();
+
+			boolean found = false;
+			while(groups.next())
+			{
+				if(toGroupID.equals(groups.getString("gID")))
+				{
+					found = true;
+					break;
+				}
+			}
+
+			if(found)
+			{
+				//Send the message
+				PreparedStatement st2 = dbcon.prepareStatement("INSERT INTO messages values(?, ?, ?, NULL, ?, GETDATE())");
+				PreparedStatement st3 = dbcon.prepareStatement("SELECT MAX(msgID) as max FROM messages");
+				ResultSet id = st3.executeQuery();
+				
+				if(id.next()) 
+					st2.setInt(1, id.getInt("max"));
+				else
+					st2.setInt(1, 1);
+				st2.setString(2, userID);
+				st2.setString(3, msg);
+				st2.setString(4, toGroupID);
+				st2.executeUpdate();
+				System.out.println("Message sent successfully");
+			}
+			else
+			{
+				System.out.println("Unable to send message: not a current member of the group");
+			}
 		}
 		catch(SQLException e1)
 		{
@@ -359,6 +453,7 @@ public class Database
 				System.out.println("SQLState = "+ e1.getErrorCode());
 				e1 = e1.getNextException();
 			}
+			System.out.println("Message failed to send");
 		}
 	}
 
