@@ -197,5 +197,13 @@ BEGIN
 		WHERE fromID = :old.userID;
 	DELETE FROM messages
 		WHERE toUserID = NULL and fromID = NULL;
+	DELETE FROM friends
+		WHERE userID1 = :old.userID or userID2 = :old.userID;
+	DELETE FROM groupMembership
+		WHERE userID = :old.userID;
+	DELETE FROM pendingGroupmembers
+		WHERE userID = :old.userID;
+	DELETE FROM pendingFriends
+		WHERE toID = :old.userID or fromId = :old.userID;
 END;
 /
