@@ -496,60 +496,60 @@ public class Database
 		}
 	}
 
-	/*Display top K who have sent to received the highest number of messages during for the past x
-	months. x and K are input parameters to this function.*/
-	public void topMessages(int k, int x)
-	{
-		try
-		{
-			//Set up the query
-			PreparedStatement st1 = dbcon.prepareStatement("SELECT * FROM "
-														+ "(SELECT toUserID, COUNT(msgId) as mCount from messages WHERE dateSent >= ? GROUP BY toUserID, mCount ORDER BY mCount DESC) "
-														+ "WHERE rownum <= ? ORDER BY rownum");
-			st1.setInt(2, k);
+// 	/*Display top K who have sent to received the highest number of messages during for the past x
+// 	months. x and K are input parameters to this function.*/
+// 	public void topMessages(int k, int x)
+// 	{
+// 		try
+// 		{
+// 			//Set up the query
+// 			PreparedStatement st1 = dbcon.prepareStatement("SELECT * FROM "
+// 														+ "(SELECT toUserID, COUNT(msgId) as mCount from messages WHERE dateSent >= ? GROUP BY toUserID, mCount ORDER BY mCount DESC) "
+// 														+ "WHERE rownum <= ? ORDER BY rownum");
+// 			st1.setInt(2, k);
 			
-			//Calculate the date from which to get the messages from
-			Calendar current = new Calendar();
-			current.add(Calendar.MONTH, -x);
-			java.sql.Date date = new java.sql.Date(current.get(Calendar.YEAR), current.get(Calendar.MONTH), current.get(Calendar.DAY));
-			st1.setDate(1, current);
-			ResultSet result = st1.executeQuery();
+// 			//Calculate the date from which to get the messages from
+// 			Calendar current = new Calendar();
+// 			current.add(Calendar.MONTH, -x);
+// 			java.sql.Date date = new java.sql.Date(current.get(Calendar.YEAR), current.get(Calendar.MONTH), current.get(Calendar.DAY));
+// 			st1.setDate(1, current);
+// 			ResultSet result = st1.executeQuery();
 
-			//Display the results
-			System.out.println("Top " + k + " messaged users in the past " + x + " months:");
-			int i = 1;
-			while(result.next())
-			{
-				System.out.println(i + ".\t" + results.getString("toUserID") + ": " + results.getInt("mCount"));
-				i++;
-			}
-		}
-		catch(SQLException e1)
-		{
-			//Print errors
-			System.out.println("SQL Error");
-			while(e1 != null)
-			{
-				System.out.println("Message = "+ e1.getMessage());
-				System.out.println("SQLState = "+ e1.getSQLState());
-				System.out.println("SQLState = "+ e1.getErrorCode());
-				e1 = e1.getNextException();
-			}
-		}
-	}
+// 			//Display the results
+// 			System.out.println("Top " + k + " messaged users in the past " + x + " months:");
+// 			int i = 1;
+// 			while(result.next())
+// 			{
+// 				System.out.println(i + ".\t" + results.getString("toUserID") + ": " + results.getInt("mCount"));
+// 				i++;
+// 			}
+// 		}
+// 		catch(SQLException e1)
+// 		{
+// 			//Print errors
+// 			System.out.println("SQL Error");
+// 			while(e1 != null)
+// 			{
+// 				System.out.println("Message = "+ e1.getMessage());
+// 				System.out.println("SQLState = "+ e1.getSQLState());
+// 				System.out.println("SQLState = "+ e1.getErrorCode());
+// 				e1 = e1.getNextException();
+// 			}
+// 		}
+// 	}
 
 	/*Remove a user and all of their information from the system. When a user is removed, the system
 	should delete the user from the groups he or she was a member of using a trigger. Note:
 	messages require special handling because they are owned by both sender and receiver. Therefore,
 	a message is deleted only when both he sender and all receivers are deleted. Attention
 	should be paid handling integrity constraints.*/
-	public void dropUser(String userID)
+	public void dropUser(int userID)
 	{
 		try
 		{
 			//Have triggers handle the details of this
 			PreparedStatement st1 = dbcon.prepareStatement("DELETE FROM profile WHERE userID = ?");
-			st1.setString(1, userID);
+			st1.setInt(1, userID);
 			st1.executeUpdate();
 		}
 		catch(SQLException e1)

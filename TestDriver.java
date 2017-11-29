@@ -32,8 +32,9 @@ public class TestDriver
 
 	public static void runTestSuite(){
 		testCreatingUser();
-		testLoginUser();
-		testInitiateFriendship();
+		// testLoginUser();
+		// testInitiateFriendship();
+		testDropUser();
 	}
 
 	public static void testCreatingUser(){
@@ -65,4 +66,18 @@ public class TestDriver
 			System.out.println("testInitiateFriendship - FAILED");
 		}
 	}
+
+	public static void testConfirmFriendship(){
+
+	}
+	public static void testDisplayFriends(){
+
+	}
+
+	public static void testDropUser(){
+		System.out.println("Starting drop user.");
+		db.dropUser(695);
+		System.out.println("FINISHED drop user.");
+	}
+	
 }

@@ -6,6 +6,6 @@
 
 @groups.sql
 
-@friendship-insert.sql
+@friends.sql
 
 @messages-insert.sql
