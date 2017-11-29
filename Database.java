@@ -736,7 +736,7 @@ logout in the profile relation,*/
 		try
 		{
 			//Get the friends of userID1
-			if(results.size() =< 4)
+			if(results.size() <= 4)
 			{
 				results.add(userID1);
 				PreparedStatement st1 = dbcon.prepareStatement("SELECT userID1, userID2 FROM friends WHERE userID1 = ? OR userID2 = ?");
