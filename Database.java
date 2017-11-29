@@ -281,7 +281,7 @@ public class Database
 			PreparedStatement st2 = dbcon.prepareStatement("INSERT INTO groupMembership values(?, ?, 'manager')");
 
 			//Not sure how to determine gID
-			PreparedStatement st3 = dbcon("SELECT MAX(gID) AS max FROM groups");
+			PreparedStatement st3 = dbcon.prepareStatement("SELECT MAX(gID) AS max FROM groups");
 			ResultSet gID = st3.executeQuery();
 			if(gID.next())
 				st1.setInt(1, gID.getInt("max"));
@@ -358,9 +358,9 @@ public class Database
 		{
 			PreparedStatement st1 = dbcon.prepareStatement("INSERT INTO messages values(?, ?, ?, ?, NULL, GETDATE())");
 			//Not sure how to determine message ID
-			PreparedStatement st2 = dbcon.PreparedStatement("SELECT MAX(msgID) as max FROM messages");
+			PreparedStatement st2 = dbcon.prepareStatement("SELECT MAX(msgID) as max FROM messages");
 			ResultSet id = st2.executeQuery();
-			if(id.next)
+			if(id.next())
 				st1.setInt(1, id.getInt("max"));
 			else
 				st1.setInt(1, 1);
@@ -597,17 +597,21 @@ public class Database
 				}
 			}
 		}
-		catch(SQLException e1)
-		{
-			//Print errors
-			System.out.println("SQL Error");
-			while(e1 != null)
-			{
-				System.out.println("Message = "+ e1.getMessage());
-				System.out.println("SQLState = "+ e1.getSQLState());
-				System.out.println("SQLState = "+ e1.getErrorCode());
-				e1 = e1.getNextException();
-			}
+		//Don't need this for now, no SQL stuff up top
+		// catch(SQLException e1)
+		// {
+		// 	//Print errors
+		// 	System.out.println("SQL Error");
+		// 	while(e1 != null)
+		// 	{
+		// 		System.out.println("Message = "+ e1.getMessage());
+		// 		System.out.println("SQLState = "+ e1.getSQLState());
+		// 		System.out.println("SQLState = "+ e1.getErrorCode());
+		// 		e1 = e1.getNextException();
+		// 	}
+		// }
+		catch(Exception e){
+			System.out.println(e);
 		}
 	}
 
@@ -747,8 +751,10 @@ logout in the profile relation,*/
 				//Scan the results to check if userID2 if found
 				while(friends.next())
 				{
-					if(userID2.equals(friends.getString("userID1")) || userID2.equals(friends.getString("userID2")))
-						return results.add(userID2);
+					if(userID2.equals(friends.getString("userID1")) || userID2.equals(friends.getString("userID2"))){
+						results.add(userID2);
+						return results;
+					}
 				}
 
 				//UserID2 was not found, so recursively check the next level of friends
@@ -770,7 +776,7 @@ logout in the profile relation,*/
 				//Else, no path exists from this friend and delete him from the path
 				else
 				{
-					results.remove(size() - 1);
+					results.remove(results.size() - 1);
 					return null;
 				}
 			}
@@ -788,5 +794,6 @@ logout in the profile relation,*/
 				e1 = e1.getNextException();
 			}
 		}
+		return null;
 	}
 }
