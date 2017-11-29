@@ -183,3 +183,19 @@ END;
 	--values(qty + 1, :new.message, :new.userID1, :new.userID2, null, null);
 --END;
 --/
+
+--When a profile is deleted, set references to it in messages to null
+--and delete messages that have no references to them
+CREATE OR REPLACE TRIGGER PROFILE_USER_TO_NULL
+AFTER
+DELETE ON profile
+FOR EACH ROW
+BEGIN
+	UPDATE ON messages SET toUserID = NULL
+		WHERE toUserID = :old.userID;
+	UPDATE ON messages SET fromID = NULL
+		WHERE fromID = :old.userID;
+	DELETE FROM messages
+		WHERE toUserID = NULL and fromID = NULL;
+END;
+/
