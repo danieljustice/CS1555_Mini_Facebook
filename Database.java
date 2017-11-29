@@ -543,14 +543,15 @@ public class Database
 	messages require special handling because they are owned by both sender and receiver. Therefore,
 	a message is deleted only when both he sender and all receivers are deleted. Attention
 	should be paid handling integrity constraints.*/
-	public void dropUser(int userID)
+	public int dropUser(int userID)
 	{
+		int rowsDropped = 0;
 		try
 		{
 			//Have triggers handle the details of this
 			PreparedStatement st1 = dbcon.prepareStatement("DELETE FROM profile WHERE userID = ?");
 			st1.setInt(1, userID);
-			st1.executeUpdate();
+			rowsDropped = st1.executeUpdate();
 		}
 		catch(SQLException e1)
 		{
@@ -563,6 +564,7 @@ public class Database
 				e1 = e1.getNextException();
 			}
 		}
+		return rowsDropped;
 	}
 
 	/*This option should cleanly shut down and exit the program after marking the time of the user's
