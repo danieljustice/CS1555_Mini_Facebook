@@ -27,29 +27,32 @@ public class TestDriver
 
 		runTestSuite();
 
-		// //Test login
-		// if(db.loginUser("695", "slfslj"))
-		// 	System.out.println("Logged in");
-		// else
-		// 	System.out.println("Not logged in");
-
-		//Test friend request generation
-		//db.initiateFriendship("1", "695");
-
 		db.closeDB();
 	}
 
 	public static void runTestSuite(){
+		flashDB();
 		testCreatingUser();
+		testDropUser();
 		testLoginUser();
 		testInitiateFriendship();
+		
+	}
+
+	//super dependent on drops working properly, horrible dependency issues
+	public static void flashDB(){
+		db.dropUser(601);
+		db.dropUser(602);
+		db.dropUser(603);
+		db.dropUser(604);
+		db.dropUser(605);
 	}
 
 	public static void testCreatingUser(){
 		// db.dropUser("1");
 		// System.out.println("Deleted User");
 		//Test user creation
-		int success = db.createUser("695", "John", "slfslj", "5-May-1987", "yy220@pitt.edu");
+		int success = db.createUser("601", "John", "slfslj", "5-May-1987", "yy220@pitt.edu");
 		if(success < 0){
 			System.out.println("testCreatingUser - FAILED");
 		}else{
@@ -59,7 +62,8 @@ public class TestDriver
 
 	public static void testLoginUser(){
 		//Test login
-		if(db.loginUser("695", "slfslj"))
+		db.createUser("603", "John", "slfslj", "5-May-1987", "yy220@pitt.edu");
+		if(db.loginUser("603", "slfslj"))
 			System.out.println("testLoginUser - Passed");
 		else
 			System.out.println("testLoginUser - FAILED");
@@ -67,11 +71,32 @@ public class TestDriver
 
 	public static void testInitiateFriendship(){
 		ByteArrayInputStream in  =  new ByteArrayInputStream("My string\nyes\n".getBytes());
-		boolean success = db.initiateFriendship("1", "695", in);
+		
+		db.createUser("604", "John", "slfslj", "5-May-1987", "yy220@pitt.edu");
+		db.createUser("605", "John", "slfslj", "5-May-1987", "yy220@pitt.edu");
+		
+		boolean success = db.initiateFriendship("604", "605", in);
 		if(success){
 			System.out.println("testInitiateFriendship - Passed");
 		}else{
 			System.out.println("testInitiateFriendship - FAILED");
 		}
 	}
+
+	public static void testConfirmFriendship(){
+
+	}
+	public static void testDisplayFriends(){
+
+	}
+
+	public static void testDropUser(){
+		db.createUser("602", "John", "slfslj", "5-May-1987", "yy220@pitt.edu");
+		if(db.dropUser(602) == 1){
+			System.out.println("testDropUser - Passed");
+		}else{
+			System.out.println("testDropUser - FAILED");
+		}
+	}
+	
 }
