@@ -191,9 +191,9 @@ AFTER
 DELETE ON profile
 FOR EACH ROW
 BEGIN
-	UPDATE ON messages SET toUserID = NULL
+	UPDATE messages SET toUserID = NULL
 		WHERE toUserID = :old.userID;
-	UPDATE ON messages SET fromID = NULL
+	UPDATE messages SET fromID = NULL
 		WHERE fromID = :old.userID;
 	DELETE FROM messages
 		WHERE toUserID = NULL and fromID = NULL;
