@@ -98,3 +98,4 @@ INSERT INTO profile (userID, name, password, date_of_birth, lastlogin, email) VA
 INSERT INTO profile (userID, name, password, date_of_birth, lastlogin, email) VALUES (98, 'Albert Albatross', 'Password 7', '15-DEC-1967', '14-SEP-2017 03.45.55.000000 PM','uoq53@pitt.edu');
 INSERT INTO profile (userID, name, password, date_of_birth, lastlogin, email) VALUES (99, 'Ivan Bufflehead', 'Password 6', '23-APR-1974', '16-MAR-2016 03.26.46.000000 PM','yxt10@pitt.edu');
 INSERT INTO profile (userID, name, password, date_of_birth, lastlogin, email) VALUES (100, 'Francisca Cliff', 'Password 2', '09-JUN-1966', '13-MAY-2017 08.10.19.000000 AM','hgc74@pitt.edu');
+commit;

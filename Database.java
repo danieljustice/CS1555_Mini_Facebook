@@ -1,11 +1,13 @@
 import java.sql.*;
 import java.util.*;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 
 public class Database
 {
 	private Connection dbcon;
 	private Timestamp last_login;
-
+	private String thisUserID;
 	//Client must ask for user and password themselves
 	public Database(String username, String password) throws SQLException
 	{
@@ -19,9 +21,11 @@ public class Database
 
 	//Given a name, email address, and date of birth, add a new user to the system by inserting as
 	//new entry in the profile relation.
-	public void createUser(String userID, String name, String password, String dob, String email)
+	public int createUser(String userID, String name, String password, String dob, String email)
 	{	
 		//Add something to convert the date to a timestamp
+		//success will be returned at end of method, -1 for fail, 0 or greater for success
+		int success = -1;
 		try
 		{
 			PreparedStatement st1 = dbcon.prepareStatement("INSERT INTO profile values(?, ?, ?, ?, NULL, ?)");
@@ -30,8 +34,7 @@ public class Database
 			st1.setString(3, password);
 			st1.setString(4, dob);
 			st1.setString(5, email);
-			int woot = st1.executeUpdate();
-			System.out.println(woot);
+			success = st1.executeUpdate();
 		}
 		catch(SQLException e1)
 		{
@@ -44,34 +47,11 @@ public class Database
 				e1 = e1.getNextException();
 			}
 		}
+		return success;
 	}
 
 
 
-
-	public void deleteUser(String userID){
-		try
-		{
-			System.out.println("RAWR");
-			PreparedStatement st1 = dbcon.prepareStatement("DELETE FROM profile WHERE userID = ?");
-			System.out.println("RAWR1");
-			st1.setString(1, userID);
-			System.out.println("RAWR2");
-			int woot = st1.executeUpdate();
-			System.out.println(woot);
-		}
-		catch(SQLException e1)
-		{
-			System.out.println("SQL Error in deleteUser method");
-			while(e1 != null)
-			{
-				System.out.println("Message = "+ e1.getMessage());
-				System.out.println("SQLState = "+ e1.getSQLState());
-				System.out.println("SQLState = "+ e1.getErrorCode());
-				e1 = e1.getNextException();
-			}
-		}
-	}
 	//Given userID and password, login as the user in the system when an appropriate match is
 	//found
 	//Return true if logged in successfully, false otherwise
@@ -94,14 +74,11 @@ public class Database
 				//Save the last login time for future use
 				PreparedStatement st3 = dbcon.prepareStatement("SELECT lastlogin FROM profile WHERE userID = ?");
 				st3.setString(1, userID);
+				thisUserID = userID;
 				ResultSet res = st3.executeQuery();
-				result.next();
+				res.next();
 				last_login = res.getTimestamp("lastlogin");
 
-				//Fix so it can add proper date
-				PreparedStatement st2 = dbcon.prepareStatement("UPDATE profile SET lastlogin = TO_TIMESTAMP(CURRENT_TIMESTAMP, 'YYYY-MM-DD HH24:MI:SS') WHERE userID = ?");
-				st2.setString(1, userID);
-				st2.executeUpdate();
 				return true;
 			}
 			else
@@ -111,7 +88,7 @@ public class Database
 		}
 		catch(SQLException e1)
 		{
-			System.out.println("SQL Error");
+			System.out.println("SQL Error in loginUser method");
 			while(e1 != null)
 			{
 				System.out.println("Message = "+ e1.getMessage());
@@ -129,11 +106,20 @@ public class Database
 	//should be prompted to enter a message to be sent along with the request. A last confirmation
 	//should be requested of the user before an entry is inserted into the pendingFriends relation,
 	//and success or failure feedback is displayed for the user.
+
 	public boolean initiateFriendship(String fromID, String toID)
+	{
+		//Using method overload here to have a version of this method that
+		//can be easily tested
+		return initiateFriendship(fromID, toID, System.in);
+	}
+
+	//Allows us to feed an inputstream into this method so that we can automate the tests
+	public boolean initiateFriendship(String fromID, String toID, InputStream in)
 	{
 		//Get a message from the user
 		System.out.println("Sending a request to " + toID);
-		Scanner scan = new Scanner(System.in);
+		Scanner scan = new Scanner(in);
 		System.out.println("Enter a message for your friendrequest:");
 		String msg = scan.nextLine();
 
@@ -164,7 +150,7 @@ public class Database
 			catch(SQLException e1)
 			{
 				//Print errors
-				System.out.println("SQL Error");
+				System.out.println("SQL Error in initiateFriendship");
 				while(e1 != null)
 				{
 					System.out.println("Message = "+ e1.getMessage());
@@ -295,7 +281,7 @@ public class Database
 			PreparedStatement st2 = dbcon.prepareStatement("INSERT INTO groupMembership values(?, ?, 'manager')");
 
 			//Not sure how to determine gID
-			PreparedStatement st3 = dbcon("SELECT MAX(gID) AS max FROM groups");
+			PreparedStatement st3 = dbcon.prepareStatement("SELECT MAX(gID) AS max FROM groups");
 			ResultSet gID = st3.executeQuery();
 			if(gID.next())
 				st1.setInt(1, gID.getInt("max"));
@@ -372,9 +358,9 @@ public class Database
 		{
 			PreparedStatement st1 = dbcon.prepareStatement("INSERT INTO messages values(?, ?, ?, ?, NULL, GETDATE())");
 			//Not sure how to determine message ID
-			PreparedStatement st2 = dbcon.PreparedStatement("SELECT MAX(msgID) as max FROM messages");
+			PreparedStatement st2 = dbcon.prepareStatement("SELECT MAX(msgID) as max FROM messages");
 			ResultSet id = st2.executeQuery();
-			if(id.next)
+			if(id.next())
 				st1.setInt(1, id.getInt("max"));
 			else
 				st1.setInt(1, 1);
@@ -611,75 +597,80 @@ public class Database
 				}
 			}
 		}
-		catch(SQLException e1)
-		{
-			//Print errors
-			System.out.println("SQL Error");
-			while(e1 != null)
-			{
-				System.out.println("Message = "+ e1.getMessage());
-				System.out.println("SQLState = "+ e1.getSQLState());
-				System.out.println("SQLState = "+ e1.getErrorCode());
-				e1 = e1.getNextException();
-			}
+		//Don't need this for now, no SQL stuff up top
+		// catch(SQLException e1)
+		// {
+		// 	//Print errors
+		// 	System.out.println("SQL Error");
+		// 	while(e1 != null)
+		// 	{
+		// 		System.out.println("Message = "+ e1.getMessage());
+		// 		System.out.println("SQLState = "+ e1.getSQLState());
+		// 		System.out.println("SQLState = "+ e1.getErrorCode());
+		// 		e1 = e1.getNextException();
+		// 	}
+		// }
+		catch(Exception e){
+			System.out.println(e);
 		}
 	}
 
-	/*Display top K who have sent to received the highest number of messages during for the past x
-	months. x and K are input parameters to this function.*/
-	public void topMessages(int k, int x)
-	{
-		try
-		{
-			//Set up the query
-			PreparedStatement st1 = dbcon.prepareStatement("SELECT * FROM "
-														+ "(SELECT toUserID, COUNT(msgId) as mCount from messages WHERE dateSent >= ? GROUP BY toUserID, mCount ORDER BY mCount DESC) "
-														+ "WHERE rownum <= ? ORDER BY rownum");
-			st1.setInt(2, k);
+// 	/*Display top K who have sent to received the highest number of messages during for the past x
+// 	months. x and K are input parameters to this function.*/
+// 	public void topMessages(int k, int x)
+// 	{
+// 		try
+// 		{
+// 			//Set up the query
+// 			PreparedStatement st1 = dbcon.prepareStatement("SELECT * FROM "
+// 														+ "(SELECT toUserID, COUNT(msgId) as mCount from messages WHERE dateSent >= ? GROUP BY toUserID, mCount ORDER BY mCount DESC) "
+// 														+ "WHERE rownum <= ? ORDER BY rownum");
+// 			st1.setInt(2, k);
 			
-			//Calculate the date from which to get the messages from
-			Calendar current = new Calendar();
-			current.add(Calendar.MONTH, -x);
-			java.sql.Date date = new java.sql.Date(current.get(Calendar.YEAR), current.get(Calendar.MONTH), current.get(Calendar.DAY));
-			st1.setDate(1, current);
-			ResultSet result = st1.executeQuery();
+// 			//Calculate the date from which to get the messages from
+// 			Calendar current = new Calendar();
+// 			current.add(Calendar.MONTH, -x);
+// 			java.sql.Date date = new java.sql.Date(current.get(Calendar.YEAR), current.get(Calendar.MONTH), current.get(Calendar.DAY));
+// 			st1.setDate(1, current);
+// 			ResultSet result = st1.executeQuery();
 
-			//Display the results
-			System.out.println("Top " + k + " messaged users in the past " + x + " months:");
-			int i = 1;
-			while(result.next())
-			{
-				System.out.println(i + ".\t" + results.getString("toUserID") + ": " + results.getInt("mCount"));
-				i++;
-			}
-		}
-		catch(SQLException e1)
-		{
-			//Print errors
-			System.out.println("SQL Error");
-			while(e1 != null)
-			{
-				System.out.println("Message = "+ e1.getMessage());
-				System.out.println("SQLState = "+ e1.getSQLState());
-				System.out.println("SQLState = "+ e1.getErrorCode());
-				e1 = e1.getNextException();
-			}
-		}
-	}
+// 			//Display the results
+// 			System.out.println("Top " + k + " messaged users in the past " + x + " months:");
+// 			int i = 1;
+// 			while(result.next())
+// 			{
+// 				System.out.println(i + ".\t" + results.getString("toUserID") + ": " + results.getInt("mCount"));
+// 				i++;
+// 			}
+// 		}
+// 		catch(SQLException e1)
+// 		{
+// 			//Print errors
+// 			System.out.println("SQL Error");
+// 			while(e1 != null)
+// 			{
+// 				System.out.println("Message = "+ e1.getMessage());
+// 				System.out.println("SQLState = "+ e1.getSQLState());
+// 				System.out.println("SQLState = "+ e1.getErrorCode());
+// 				e1 = e1.getNextException();
+// 			}
+// 		}
+// 	}
 
 	/*Remove a user and all of their information from the system. When a user is removed, the system
 	should delete the user from the groups he or she was a member of using a trigger. Note:
 	messages require special handling because they are owned by both sender and receiver. Therefore,
 	a message is deleted only when both he sender and all receivers are deleted. Attention
 	should be paid handling integrity constraints.*/
-	public void dropUser(String userID)
+	public int dropUser(int userID)
 	{
+		int rowsDropped = 0;
 		try
 		{
 			//Have triggers handle the details of this
 			PreparedStatement st1 = dbcon.prepareStatement("DELETE FROM profile WHERE userID = ?");
-			st1.setString(1, userID);
-			st1.executeUpdate();
+			st1.setInt(1, userID);
+			rowsDropped = st1.executeUpdate();
 		}
 		catch(SQLException e1)
 		{
@@ -692,13 +683,34 @@ public class Database
 				e1 = e1.getNextException();
 			}
 		}
+		return rowsDropped;
 	}
 
 	/*This option should cleanly shut down and exit the program after marking the time of the user's
 logout in the profile relation,*/
 	public void Logout()
 	{
-		closeDB();
+		//Fix so it can add proper date
+
+		try
+		{
+			PreparedStatement st2 = dbcon.prepareStatement("UPDATE profile SET lastlogin = TO_TIMESTAMP(CURRENT_TIMESTAMP, 'YYYY-MM-DD HH24:MI:SS') WHERE userID = ?");
+			st2.setString(1, thisUserID);
+			st2.executeUpdate();
+			closeDB();
+		}
+		catch(SQLException e1)
+		{
+			//Print errors
+			System.out.println("SQL Error");
+			while(e1 != null)
+			{
+				System.out.println("Message = "+ e1.getMessage());
+				System.out.println("SQLState = "+ e1.getSQLState());
+				System.out.println("SQLState = "+ e1.getErrorCode());
+				e1 = e1.getNextException();
+			}
+		}
 	}
 
 	public void closeDB()
@@ -728,7 +740,7 @@ logout in the profile relation,*/
 		try
 		{
 			//Get the friends of userID1
-			if(results.size() =< 4)
+			if(results.size() <= 4)
 			{
 				results.add(userID1);
 				PreparedStatement st1 = dbcon.prepareStatement("SELECT userID1, userID2 FROM friends WHERE userID1 = ? OR userID2 = ?");
@@ -739,8 +751,10 @@ logout in the profile relation,*/
 				//Scan the results to check if userID2 if found
 				while(friends.next())
 				{
-					if(userID2.equals(friends.getString("userID1")) || userID2.equals(friends.getString("userID2")))
-						return results.add(userID2);
+					if(userID2.equals(friends.getString("userID1")) || userID2.equals(friends.getString("userID2"))){
+						results.add(userID2);
+						return results;
+					}
 				}
 
 				//UserID2 was not found, so recursively check the next level of friends
@@ -762,7 +776,7 @@ logout in the profile relation,*/
 				//Else, no path exists from this friend and delete him from the path
 				else
 				{
-					results.remove(size() - 1);
+					results.remove(results.size() - 1);
 					return null;
 				}
 			}
@@ -780,5 +794,6 @@ logout in the profile relation,*/
 				e1 = e1.getNextException();
 			}
 		}
+		return null;
 	}
 }
