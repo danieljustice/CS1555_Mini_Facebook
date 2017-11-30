@@ -51,6 +51,8 @@ public class TestDriver
 	public static void testCreatingUser(){
 		// db.dropUser("1");
 		// System.out.println("Deleted User");
+		//drop user
+		db.dropUser(601);
 		//Test user creation
 		int success = db.createUser("601", "John", "slfslj", "5-May-1987", "yy220@pitt.edu");
 		if(success < 0){
@@ -61,6 +63,8 @@ public class TestDriver
 	}
 
 	public static void testLoginUser(){
+		//drop created users 
+		db.dropUser(603);
 		//Test login
 		db.createUser("603", "John", "slfslj", "5-May-1987", "yy220@pitt.edu");
 		if(db.loginUser("603", "slfslj"))
@@ -70,6 +74,10 @@ public class TestDriver
 	}
 
 	public static void testInitiateFriendship(){
+		//drop created users
+		db.dropUser(604);
+		db.dropUser(605);
+		//fake input from the user
 		ByteArrayInputStream in  =  new ByteArrayInputStream("My string\nyes\n".getBytes());
 		
 		db.createUser("604", "John", "slfslj", "5-May-1987", "yy220@pitt.edu");
@@ -91,6 +99,9 @@ public class TestDriver
 	}
 
 	public static void testDropUser(){
+		//drop user, this is an odd dependency....
+		db.dropUser(602);
+
 		db.createUser("602", "John", "slfslj", "5-May-1987", "yy220@pitt.edu");
 		if(db.dropUser(602) == 1){
 			System.out.println("testDropUser - Passed");
