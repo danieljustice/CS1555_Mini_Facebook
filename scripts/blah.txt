@@ -1,0 +1,12 @@
+select gID from groupMembership
+where 43=userID and 'manager' = role;
+
+select * from pendingGroupmembers
+where 9 = gID;
+
+select * from groupMembership
+
+
+select pendingGroupmembers.userID, pendingGroupmembers.message from 
+groupMembership join pendingGroupmembers ON groupMembership.gID = pendingGroupmembers.gID
+where 43=groupMembership.userID and 'manager'=groupMembership.role;

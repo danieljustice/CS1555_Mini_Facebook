@@ -166,27 +166,141 @@ public class Database
 			return false;
 		}
 	}
-
+	public void confirmFriendship(String userID){
+		confirmFriendship(userID, System.in);
+	}
 	//This task should first display a formatted, numbered list of all outstanding friends and group
 	//requests with an associated messages. Then, the user should be prompted for a number of the
 	//request he or she would like to confirm or given the option to confirm them all. The application
 	//should move the request from the appropriate pendingFriends or pendingGroupmembers
 	//relation to the friends or groupMembership relation. The remaining requests which were not
 	//selected are declined and removed from pendingFriends and pendingGroupmembers relations.
-	public void confirmFriendship(String userID)
+	public void confirmFriendship(String userID, InputStream in)
 	{
 		try
 		{
 			//Search for friend requests to confirm
-			PreparedStatement st1 = dbcon.prepareStatement("SELECT fromID, message FROM pendingFriends WHERE toID = ?");
+			PreparedStatement st1 = dbcon.prepareStatement("SELECT fromID, message FROM pendingFriends WHERE toID = ?", ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE, ResultSet.HOLD_CURSORS_OVER_COMMIT	);
 			st1.setString(1, userID);
 			ResultSet friends = st1.executeQuery();
 
 			//Search for group requests to confirm
-			//Display the results
+			PreparedStatement st2 = dbcon.prepareStatement("select pendingGroupmembers.userID, pendingGroupmembers.message, pendingGroupmembers.gID "
+															+"from groupMembership join pendingGroupmembers "
+																+"ON groupMembership.gID = pendingGroupmembers.gID "
+															+"where ?=groupMembership.userID and 'manager'=groupMembership.role");
+			st2.setString(1, userID);
+			ResultSet groupFriends = st2.executeQuery();
+
+			//Push friend results into a 2D arraylist
+			List<List<String>> friendArr = new ArrayList<List<String>>();
+			for(int i = 0; friends.next(); i++){
+				friendArr.add(new ArrayList<String>());
+				friendArr.get(i).add(friends.getString(1));
+				friendArr.get(i).add(friends.getString(2));
+				
+			}
+			//Push groupFriend results into a 2D arraylist
+			List<List<String>> groupFriendsArr = new ArrayList<List<String>>();
+			for(int i = 0; groupFriends.next(); i++){
+				groupFriendsArr.add(new ArrayList<String>());
+				groupFriendsArr.get(i).add(groupFriends.getString(1));
+				groupFriendsArr.get(i).add(groupFriends.getString(2));
+				groupFriendsArr.get(i).add(groupFriends.getString(3));
+			}
+
+			//Display pending friends
+			int friendNum = 0;
+			if(friendArr.size() > 0){
+				System.out.println("Pending friends:\tTheir Messages:");
+				for(friendNum = 0; friendNum < friendArr.size(); friendNum++){
+					System.out.println(friendNum+1 + ")\t\t" + friendArr.get(friendNum).get(0) + "\t\t\t" + friendArr.get(friendNum).get(1));
+				}
+			}else{
+				System.out.println("There are no pending friend requests for " + userID + ".");
+			}
+
+			//Display pending friends
+			if(groupFriendsArr.size() > 0){
+				System.out.println("Pending friends:\tGroupID:\tTheir Messages:");
+				for(int i = 0; i < groupFriendsArr.size(); i++){
+					System.out.println(friendNum+i+1 + ")\t\t" + groupFriendsArr.get(i).get(0) + "\t\t" + groupFriendsArr.get(i).get(2) + "\t\t\t" + groupFriendsArr.get(i).get(2));
+				}
+			}else{
+				System.out.println("There are no pending friend requests for " + userID + "'s groups.");
+			}
+			
 			//Ask which requests to confirm
+			Scanner scan = new Scanner(in);
+			String input = "";
+			Set<Integer> friendsToAdd = new HashSet<Integer>();
+			while(!input.contains("-1")){
+				System.out.println();
+				System.out.println("Type a profile's number to accept as friend.");
+				System.out.println("Or type 0 to add all.");
+				System.out.println("Or type -1 to quit and delete every request you do not accept.");
+				input = scan.nextLine();
+				//try to parse input and make sure it is a valid number
+				try {
+					int integerInput = Integer.parseInt(input);
+					if(integerInput == 0){		//if add all, then add all and then set to exit
+						//add all
+						for(int i = 0; i < friendArr.size() + groupFriendsArr.size(); i++){
+							friendsToAdd.add(i+1);
+						}
+						input = "-1";
+
+					}else if(integerInput == -1){	//if -1, just let it go through and exit
+						//do nothing
+					}else if(integerInput> 0 && integerInput < friendArr.size() + groupFriendsArr.size() + 1){	//check range
+						friendsToAdd.add(integerInput);
+					}else{
+						System.out.println("Not a valid input");
+					}
+				} catch (Exception e) {
+					//TODO: handle exception
+					System.out.println("Not a valid input");
+				}
+			}
+			//INSERT INTO friends values(605, 604, CURRENT_DATE(), yo)
 			//Move those requests to the appropriate place
+			for(int index:friendsToAdd){
+				if(index < friendArr.size()+1){
+					PreparedStatement st3 = dbcon.prepareStatement("INSERT INTO friends values(?, ?, CURRENT_DATE, ?)");
+					st3.setString(1, userID);
+					st3.setString(2, friendArr.get(index-1).get(0));
+					st3.setString(3, friendArr.get(index-1).get(1));
+					st3.executeUpdate();
+
+					friendArr.set(index-1, null);
+				}else{
+					//0 is the userID, 2 is the gID
+					PreparedStatement st3 = dbcon.prepareStatement("INSERT INTO groupMembership values(?, ?, 'user')");
+					st3.setString(1, groupFriendsArr.get(index-1).get(2));
+					st3.setString(2, groupFriendsArr.get(index-1).get(0));
+					st3.executeUpdate();
+				}
+			}
 			//Delete the others
+			for(int i = 0; i < friendArr.size(); i++){
+				if(friendArr.get(i) != null){
+					//drop pending request
+					PreparedStatement st3 = dbcon.prepareStatement("DELETE FROM pendingFriends WHERE fromID = ? AND toID = ?");
+					st3.setString(1, friendArr.get(i).get(0));
+					st3.setString(2, userID);
+					st3.executeQuery();
+				}
+			}
+
+			for(int i = 0; i < groupFriendsArr.size(); i++){
+				if(groupFriendsArr.get(i) != null){
+					//drop pending request
+					PreparedStatement st3 = dbcon.prepareStatement("DELETE FROM pendingGroupmembers WHERE gID = ? AND userID = ?");
+					st3.setString(1, groupFriendsArr.get(i).get(2));
+					st3.setString(2, groupFriendsArr.get(i).get(0));
+					st3.executeQuery();
+				}
+			}
 		}
 		catch(SQLException e1)
 		{
