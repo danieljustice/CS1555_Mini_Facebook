@@ -233,12 +233,19 @@ public class Database
 
 			//Display the friends
 			System.out.println("Your friends:");
+			ArrayList<String> list = new ArrayList<String>();
 			while(friends.next())
 			{
 				if(userID.equalsIgnoreCase(friends.getString("userID1")))
+				{
 					System.out.println("Name: " + friends.getString("name") + ", " + friends.getString("userID2"));
+					list.add(friends.getString("userID2"));
+				}
 				else
+				{
 					System.out.println("Name: " + friends.getString("name") + ", " + friends.getString("userID1"));
+					list.add(friends.getString("userID1"));
+				}
 			}
 
 			//Menu to request profiles
@@ -249,16 +256,19 @@ public class Database
 			while(!input.equals("0"))
 			{
 				//Get the profile
-				st2.setString(1, input);
-				ResultSet results = st2.executeQuery();
-				results.next();
+				//User input error check
+				if(list.contains(input))
+				{
+					st2.setString(1, input);
+					ResultSet results = st2.executeQuery();
+					results.next();
 
-				//Display the results
-				System.out.println("Name: " + results.getString("name"));
-				System.out.println("userID: " + results.getString("userID"));
-				System.out.println("email: " + results.getString("email"));
-				System.out.println("Date of Birth:" + results.getDate("date_of_birth") + "\n");
-
+					//Display the results
+					System.out.println("Name: " + results.getString("name"));
+					System.out.println("userID: " + results.getString("userID"));
+					System.out.println("email: " + results.getString("email"));
+					System.out.println("Date of Birth:" + results.getDate("date_of_birth") + "\n");
+				}
 				//Ask for input
 				System.out.println("Enter a profileID to request a profile(enter 0 to exit):");
 				input = scan.nextLine();
@@ -365,12 +375,12 @@ public class Database
 
 		try
 		{
-			PreparedStatement st1 = dbcon.prepareStatement("INSERT INTO messages values(?, ?, ?, ?, NULL, GETDATE())");
+			PreparedStatement st1 = dbcon.prepareStatement("INSERT INTO messages values(?, ?, ?, ?, NULL, CURRENT_DATE)");
 			//Not sure how to determine message ID
 			PreparedStatement st2 = dbcon.prepareStatement("SELECT MAX(msgID) as max FROM messages");
 			ResultSet id = st2.executeQuery();
 			if(id.next())
-				st1.setInt(1, id.getInt("max"));
+				st1.setInt(1, id.getInt("max") + 1);
 			else
 				st1.setInt(1, 1);
 			st1.setString(2, fromID);
@@ -411,7 +421,7 @@ public class Database
 		{
 			//Ask for the message
 			Scanner scan = new Scanner(System.in);
-			System.out.println("Please enter your message: ");
+			System.out.println("Please enter your message to the group: ");
 			String msg = scan.nextLine();
 
 			//First check if the user is in the group
@@ -432,12 +442,12 @@ public class Database
 			if(found)
 			{
 				//Send the message
-				PreparedStatement st2 = dbcon.prepareStatement("INSERT INTO messages values(?, ?, ?, NULL, ?, GETDATE())");
+				PreparedStatement st2 = dbcon.prepareStatement("INSERT INTO messages values(?, ?, ?, NULL, ?, CURRENT_DATE)");
 				PreparedStatement st3 = dbcon.prepareStatement("SELECT MAX(msgID) as max FROM messages");
 				ResultSet id = st3.executeQuery();
 				
 				if(id.next()) 
-					st2.setInt(1, id.getInt("max"));
+					st2.setInt(1, id.getInt("max") + 1);
 				else
 					st2.setInt(1, 1);
 				st2.setString(2, userID);

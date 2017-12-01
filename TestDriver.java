@@ -40,6 +40,8 @@ public class TestDriver
 		testCreateGroup();
 		//testConfirmFriendship();
 		testAddingGroup();
+		testMessageToUser();
+		testMessageToGroup();
 
 		db.Logout("603");
 	}
@@ -127,12 +129,12 @@ public class TestDriver
 
 	public static void testMessageToUser()
 	{
-
+		db.sendMessageToUser("1", "2");
 	}
 
 	public static void testMessageToGroup()
 	{
-
+		db.sendMessageToGroup("54", "2");
 	}
 
 	public static void testDisplayMessages()
@@ -157,7 +159,7 @@ public class TestDriver
 
 	public static void testTopMessages()
 	{
-		
+
 	}
 	
 }
