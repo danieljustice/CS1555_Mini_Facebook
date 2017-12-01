@@ -75,7 +75,6 @@ END;
 
 --Add an entry to message recipient when a new message is created
 --*Adds entries only for those that go to users, not groups
---Needs fixed
 CREATE OR REPLACE TRIGGER INSERT_MESSAGE_RECIPIENT
 AFTER
 INSERT ON messages
@@ -144,16 +143,22 @@ END;
 /
 
 --Add a message to messageRecipients
-CREATE OR REPLACE TRIGGER ADD_TO_RECIPIENTS
-AFTER
-INSERT ON messages
-FOR EACH ROW
-BEGIN
-	IF :new.toUserID = null then
-		INSERT INTO messageRecipient values(:new.msgID, :new.toUserID);
-	END IF;
-END;
-/
+--CREATE OR REPLACE TRIGGER ADD_TO_RECIPIENTS
+--AFTER
+--INSERT ON messages
+--FOR EACH ROW
+--BEGIN
+	--id = :new.msgID;
+	--IF :new.toGroupID = null then
+		--INSERT INTO messageRecipient values(:new.msgID, :new.toUserID);
+
+	--ELSE
+		--INSERT INTO messageRecipient (msgID, userID)
+		--SELECT msgID, userID FROM (groupMembership JOIN messages ON (gID = toGroupID));
+		--WHERE msgID = :new.msgID;
+	--END IF;
+--END;
+--/
 
 
 
@@ -186,24 +191,41 @@ END;
 
 --When a profile is deleted, set references to it in messages to null
 --and delete messages that have no references to them
-CREATE OR REPLACE TRIGGER PROFILE_USER_TO_NULL
+--CREATE OR REPLACE TRIGGER PROFILE_USER_TO_NULL
+--BEFORE
+--DELETE ON profile
+--FOR EACH ROW
+--BEGIN
+	--UPDATE messages SET toUserID = NULL
+		--WHERE toUserID = :old.userID;
+	--UPDATE messages SET fromID = NULL
+		--WHERE fromID = :old.userID;
+	--DELETE FROM messages
+		--WHERE toUserID = NULL and fromID = NULL;
+--END;
+--/
+
+--Delete a message where the recipient and userID have been deleted
+--CREATE OR REPLACE TRIGGER DELETE_MESSAGE
+--AFTER
+--DELETE ON profile
+--FOR EACH ROW
+--BEGIN
+	--DELETE FROM messages
+	--WHERE toUserID is null and fromID is null;
+--END;
+--/
+
+--Insert into message recipients group messages
+CREATE OR REPLACE TRIGGER ADD_GM_TO_RECIPIENTS
 AFTER
-DELETE ON profile
-FOR EACH ROW
+INSERT ON messages
+FOR EACH ROW WHEN(new.toGroupId  is not null)
 BEGIN
-	UPDATE messages SET toUserID = NULL
-		WHERE toUserID = :old.userID;
-	UPDATE messages SET fromID = NULL
-		WHERE fromID = :old.userID;
-	DELETE FROM messages
-		WHERE toUserID = NULL and fromID = NULL;
-	DELETE FROM friends
-		WHERE userID1 = :old.userID or userID2 = :old.userID;
-	DELETE FROM groupMembership
-		WHERE userID = :old.userID;
-	DELETE FROM pendingGroupmembers
-		WHERE userID = :old.userID;
-	DELETE FROM pendingFriends
-		WHERE toID = :old.userID or fromId = :old.userID;
+	--IF :new.toGroupID <> null then
+		INSERT INTO messageRecipient (msgID, userID)
+		SELECT :new.msgID, userID FROM groupMembership
+		WHERE gID = :new.toGroupID;
+	--END IF; 
 END;
 /

@@ -36,7 +36,16 @@ public class TestDriver
 		testDropUser();
 		testLoginUser();
 		testInitiateFriendship();
+
+		testDisplayFriends();
+		testCreateGroup();
 		testConfirmFriendship();
+		testAddingGroup();
+		testMessageToUser();
+		testMessageToGroup();
+
+		db.Logout("603");
+
 	}
 
 	//super dependent on drops working properly, horrible dependency issues
@@ -98,7 +107,7 @@ public class TestDriver
 		db.confirmFriendship("43");
 	}
 	public static void testDisplayFriends(){
-
+		db.displayFriends("55");
 	}
 
 	public static void testDropUser(){
@@ -111,6 +120,51 @@ public class TestDriver
 		}else{
 			System.out.println("testDropUser - FAILED");
 		}
+	}
+
+	public static void testCreateGroup()
+	{
+		db.createGroup("23", "Yes, we dem bois", 5, "603");
+	}
+
+	public static void testAddingGroup()
+	{
+		db.initiateAddingGroup("25", "11");
+	}
+
+	public static void testMessageToUser()
+	{
+		db.sendMessageToUser("1", "2");
+	}
+
+	public static void testMessageToGroup()
+	{
+		db.sendMessageToGroup("54", "2");
+	}
+
+	public static void testDisplayMessages()
+	{
+
+	}
+
+	public static void testDisplayNewMessages()
+	{
+
+	}
+
+	public static void testSearch()
+	{
+
+	}
+
+	public static void test3Degrees()
+	{
+
+	}
+
+	public static void testTopMessages()
+	{
+
 	}
 	
 }

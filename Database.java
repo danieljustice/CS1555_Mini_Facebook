@@ -5,9 +5,15 @@ import java.io.InputStream;
 
 public class Database
 {
+	/*Note: there are plans of instead of passing the same userID to the system everytime 
+	*it will be saved as a class variable and will be set to accordingly on Login and
+	*set to null on logout.
+	*This will be implemented in the final version of the project.
+	*/
 	private Connection dbcon;
 	private Timestamp last_login;
 	private String thisUserID;
+
 	//Client must ask for user and password themselves
 	public Database(String username, String password) throws SQLException
 	{
@@ -329,7 +335,7 @@ public class Database
 		{
 			//Get all the friends of the user
 			PreparedStatement st1 = dbcon.prepareStatement("SELECT userID1, userID2, name FROM "
-															+ "(friends JOIN profile ON (((userID1 = userID) and (userID1 <> ?)) or ((userID2 = userID) and (userID2 <> ?)))"
+															+ "(friends JOIN profile ON (((userID1 = userID) and (userID1 <> ?)) or ((userID2 = userID) and (userID2 <> ?))))"
 															+ "WHERE userID1 = ? OR userID2 = ?");
 			PreparedStatement st2 = dbcon.prepareStatement("SELECT userID, name, date_of_birth, email FROM profile WHERE userID = ?");
 
@@ -341,12 +347,19 @@ public class Database
 
 			//Display the friends
 			System.out.println("Your friends:");
+			ArrayList<String> list = new ArrayList<String>();
 			while(friends.next())
 			{
 				if(userID.equalsIgnoreCase(friends.getString("userID1")))
+				{
 					System.out.println("Name: " + friends.getString("name") + ", " + friends.getString("userID2"));
+					list.add(friends.getString("userID2"));
+				}
 				else
+				{
 					System.out.println("Name: " + friends.getString("name") + ", " + friends.getString("userID1"));
+					list.add(friends.getString("userID1"));
+				}
 			}
 
 			//Menu to request profiles
@@ -357,15 +370,19 @@ public class Database
 			while(!input.equals("0"))
 			{
 				//Get the profile
-				st2.setString(1, input);
-				ResultSet results = st2.executeQuery();
+				//User input error check
+				if(list.contains(input))
+				{
+					st2.setString(1, input);
+					ResultSet results = st2.executeQuery();
+					results.next();
 
-				//Display the results
-				System.out.println("Name: " + results.getString("name"));
-				System.out.println("userID: " + results.getString("userID"));
-				System.out.println("email: " + results.getString("email"));
-				System.out.println("Date of Birth:" + results.getDate("date_of_birth") + "\n");
-
+					//Display the results
+					System.out.println("Name: " + results.getString("name"));
+					System.out.println("userID: " + results.getString("userID"));
+					System.out.println("email: " + results.getString("email"));
+					System.out.println("Date of Birth:" + results.getDate("date_of_birth") + "\n");
+				}
 				//Ask for input
 				System.out.println("Enter a profileID to request a profile(enter 0 to exit):");
 				input = scan.nextLine();
@@ -391,21 +408,23 @@ public class Database
 	{
 		try
 		{
-			PreparedStatement st1 = dbcon.prepareStatement("INSERT INTO groups values(?, ?, ?)");
+			PreparedStatement st1 = dbcon.prepareStatement("INSERT INTO groups values(?, ?, ?, ?)");
 			PreparedStatement st2 = dbcon.prepareStatement("INSERT INTO groupMembership values(?, ?, 'manager')");
 
 			//Not sure how to determine gID
 			PreparedStatement st3 = dbcon.prepareStatement("SELECT MAX(gID) AS max FROM groups");
 			ResultSet gID = st3.executeQuery();
 			if(gID.next())
-				st1.setInt(1, gID.getInt("max"));
+				st1.setInt(1, gID.getInt("max") + 1);
 			else
 				st1.setInt(1, 1);
 			st1.setString(2, name);
 			st1.setString(3, desc);
+			st1.setInt(4, limit);
 			st1.executeUpdate();
 
 			//Add the user to the group as a manager
+			st2.setInt(1, gID.getInt("max") + 1);
 			st2.setString(2, userID);
 			st2.executeUpdate();
 		}
@@ -470,12 +489,12 @@ public class Database
 
 		try
 		{
-			PreparedStatement st1 = dbcon.prepareStatement("INSERT INTO messages values(?, ?, ?, ?, NULL, GETDATE())");
+			PreparedStatement st1 = dbcon.prepareStatement("INSERT INTO messages values(?, ?, ?, ?, NULL, CURRENT_DATE)");
 			//Not sure how to determine message ID
 			PreparedStatement st2 = dbcon.prepareStatement("SELECT MAX(msgID) as max FROM messages");
 			ResultSet id = st2.executeQuery();
 			if(id.next())
-				st1.setInt(1, id.getInt("max"));
+				st1.setInt(1, id.getInt("max") + 1);
 			else
 				st1.setInt(1, 1);
 			st1.setString(2, fromID);
@@ -516,7 +535,7 @@ public class Database
 		{
 			//Ask for the message
 			Scanner scan = new Scanner(System.in);
-			System.out.println("Please enter your message: ");
+			System.out.println("Please enter your message to the group: ");
 			String msg = scan.nextLine();
 
 			//First check if the user is in the group
@@ -537,12 +556,12 @@ public class Database
 			if(found)
 			{
 				//Send the message
-				PreparedStatement st2 = dbcon.prepareStatement("INSERT INTO messages values(?, ?, ?, NULL, ?, GETDATE())");
+				PreparedStatement st2 = dbcon.prepareStatement("INSERT INTO messages values(?, ?, ?, NULL, ?, CURRENT_DATE)");
 				PreparedStatement st3 = dbcon.prepareStatement("SELECT MAX(msgID) as max FROM messages");
 				ResultSet id = st3.executeQuery();
 				
 				if(id.next()) 
-					st2.setInt(1, id.getInt("max"));
+					st2.setInt(1, id.getInt("max") + 1);
 				else
 					st2.setInt(1, 1);
 				st2.setString(2, userID);
@@ -578,7 +597,7 @@ public class Database
 		try
 		{
 			//Get all the messages sent to the user and order by dateSent descending
-			PreparedStatement st1 = dbcon.prepareStatement("SELECT fromID, message, dateSent FROM messages WHERE toUserID = ? ORDER BY dateSent DESC");
+			PreparedStatement st1 = dbcon.prepareStatement("SELECT fromID, message, dateSent FROM (messageRecipient JOIN messages ON (messageRecipient.userID = messages.toUserID)) WHERE toUserID = ? ORDER BY dateSent DESC");
 			st1.setString(1, userID);
 			ResultSet results = st1.executeQuery();
 
@@ -610,7 +629,7 @@ public class Database
 		try
 		{
 			//Get all messages sent to the user since last login time
-			PreparedStatement st1 = dbcon.prepareStatement("SELECT fromID, message, dateSent FROM messages WHERE toUserID = ? and dateSent > ? ORDER BY dateSent DESC");
+			PreparedStatement st1 = dbcon.prepareStatement("SELECT fromID, message, dateSent FROM (messageRecipient JOIN messages ON (messageRecipient.userID = messages.toUserID)) WHERE toUserID = ? and dateSent > ? ORDER BY dateSent DESC");
 			st1.setString(1, userID);
 			st1.setTimestamp(2, last_login);
 			ResultSet results = st1.executeQuery();
@@ -729,47 +748,47 @@ public class Database
 		}
 	}
 
-// 	/*Display top K who have sent to received the highest number of messages during for the past x
-// 	months. x and K are input parameters to this function.*/
-// 	public void topMessages(int k, int x)
-// 	{
-// 		try
-// 		{
-// 			//Set up the query
-// 			PreparedStatement st1 = dbcon.prepareStatement("SELECT * FROM "
-// 														+ "(SELECT toUserID, COUNT(msgId) as mCount from messages WHERE dateSent >= ? GROUP BY toUserID, mCount ORDER BY mCount DESC) "
-// 														+ "WHERE rownum <= ? ORDER BY rownum");
-// 			st1.setInt(2, k);
+ 	/*Display top K who have sent to received the highest number of messages during for the past x
+ 	months. x and K are input parameters to this function.*/
+ 	public void topMessages(int k, int x)
+ 	{
+ 		try
+ 		{
+ 			//Set up the query
+ 			PreparedStatement st1 = dbcon.prepareStatement("SELECT * FROM "
+ 														+ "(SELECT toUserID, COUNT(msgId) as mCount from (messageRecipient JOIN messages ON (messageRecipient.userID = messages.toUserID)) WHERE dateSent >= ? GROUP BY toUserID, mCount ORDER BY mCount DESC) "
+ 														+ "WHERE rownum <= ? ORDER BY rownum");
+ 			st1.setInt(2, k);
 			
-// 			//Calculate the date from which to get the messages from
-// 			Calendar current = new Calendar();
-// 			current.add(Calendar.MONTH, -x);
-// 			java.sql.Date date = new java.sql.Date(current.get(Calendar.YEAR), current.get(Calendar.MONTH), current.get(Calendar.DAY));
-// 			st1.setDate(1, current);
-// 			ResultSet result = st1.executeQuery();
+ 			//Calculate the date from which to get the messages from
+ 			Calendar current = Calendar.getInstance();
+ 			current.add(current.get(Calendar.MONTH), -x);
+ 			java.sql.Date date = new java.sql.Date(current.get(Calendar.YEAR), current.get(Calendar.MONTH), current.get(Calendar.DAY_OF_MONTH));
+ 			st1.setDate(1, date);
+ 			ResultSet result = st1.executeQuery();
 
-// 			//Display the results
-// 			System.out.println("Top " + k + " messaged users in the past " + x + " months:");
-// 			int i = 1;
-// 			while(result.next())
-// 			{
-// 				System.out.println(i + ".\t" + results.getString("toUserID") + ": " + results.getInt("mCount"));
-// 				i++;
-// 			}
-// 		}
-// 		catch(SQLException e1)
-// 		{
-// 			//Print errors
-// 			System.out.println("SQL Error");
-// 			while(e1 != null)
-// 			{
-// 				System.out.println("Message = "+ e1.getMessage());
-// 				System.out.println("SQLState = "+ e1.getSQLState());
-// 				System.out.println("SQLState = "+ e1.getErrorCode());
-// 				e1 = e1.getNextException();
-// 			}
-// 		}
-// 	}
+ 			//Display the results
+ 			System.out.println("Top " + k + " messaged users in the past " + x + " months:");
+ 			int i = 1;
+ 			while(result.next())
+ 			{
+ 				System.out.println(i + ".\t" + result.getString("toUserID") + ": " + result.getInt("mCount"));
+ 				i++;
+ 			}
+ 		}
+ 		catch(SQLException e1)
+ 		{
+ 			//Print errors
+ 			System.out.println("SQL Error");
+ 			while(e1 != null)
+ 			{
+ 				System.out.println("Message = "+ e1.getMessage());
+ 				System.out.println("SQLState = "+ e1.getSQLState());
+ 				System.out.println("SQLState = "+ e1.getErrorCode());
+ 				e1 = e1.getNextException();
+ 			}
+ 		}
+ 	}
 
 	/*Remove a user and all of their information from the system. When a user is removed, the system
 	should delete the user from the groups he or she was a member of using a trigger. Note:
@@ -802,14 +821,14 @@ public class Database
 
 	/*This option should cleanly shut down and exit the program after marking the time of the user's
 logout in the profile relation,*/
-	public void Logout()
+	public void Logout(String userID)
 	{
 		//Fix so it can add proper date
 
 		try
 		{
-			PreparedStatement st2 = dbcon.prepareStatement("UPDATE profile SET lastlogin = TO_TIMESTAMP(CURRENT_TIMESTAMP, 'YYYY-MM-DD HH24:MI:SS') WHERE userID = ?");
-			st2.setString(1, thisUserID);
+			PreparedStatement st2 = dbcon.prepareStatement("UPDATE profile SET lastlogin = CURRENT_TIMESTAMP WHERE userID = ?");
+			st2.setString(1, userID);
 			st2.executeUpdate();
 			closeDB();
 		}

@@ -71,9 +71,9 @@ CREATE TABLE messages(
 	toGroupID number,
 	dateSent date,
 	CONSTRAINT messages_pk PRIMARY KEY (msgID),
-	CONSTRAINT messages_fk1 FOREIGN KEY (toUserID) REFERENCES profile(userID),
+	CONSTRAINT messages_fk1 FOREIGN KEY (toUserID) REFERENCES profile(userID) ON DELETE SET NULL,
 	CONSTRAINT messages_fk2 FOREIGN KEY (toGroupID) REFERENCES groups(gID) ON DELETE CASCADE,
-	CONSTRAINT messages_fk3 FOREIGN KEY (fromID) REFERENCES profile(userID),
+	CONSTRAINT messages_fk3 FOREIGN KEY (fromID) REFERENCES profile(userID) ON DELETE SET NULL,
 	CONSTRAINT messages_selfsend_check CHECK (fromID <> toUserID));
 
 ALTER TABLE messages modify toGroupID default null;
