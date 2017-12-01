@@ -627,7 +627,7 @@ public class Database
  	/*Display top K who have sent to received the highest number of messages during for the past x
  	months. x and K are input parameters to this function.*/
  	public void topMessages(int k, int x)
- 	{/*
+ 	{
  		try
  		{
  			//Set up the query
@@ -637,10 +637,10 @@ public class Database
  			st1.setInt(2, k);
 			
  			//Calculate the date from which to get the messages from
- 			Calendar current = new Calendar();
- 			current.add(Calendar.MONTH, -x);
- 			java.sql.Date date = new java.sql.Date(current.get(Calendar.YEAR), current.get(Calendar.MONTH), current.get(Calendar.DAY));
- 			st1.setDate(1, current);
+ 			Calendar current = Calendar.getInstance();
+ 			current.add(current.get(Calendar.MONTH), -x);
+ 			java.sql.Date date = new java.sql.Date(current.get(Calendar.YEAR), current.get(Calendar.MONTH), current.get(Calendar.DAY_OF_MONTH));
+ 			st1.setDate(1, date);
  			ResultSet result = st1.executeQuery();
 
  			//Display the results
@@ -648,7 +648,7 @@ public class Database
  			int i = 1;
  			while(result.next())
  			{
- 				System.out.println(i + ".\t" + results.getString("toUserID") + ": " + results.getInt("mCount"));
+ 				System.out.println(i + ".\t" + result.getString("toUserID") + ": " + result.getInt("mCount"));
  				i++;
  			}
  		}
@@ -663,7 +663,7 @@ public class Database
  				System.out.println("SQLState = "+ e1.getErrorCode());
  				e1 = e1.getNextException();
  			}
- 		}*/
+ 		}
  	}
 
 	/*Remove a user and all of their information from the system. When a user is removed, the system
