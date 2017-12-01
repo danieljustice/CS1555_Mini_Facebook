@@ -36,14 +36,16 @@ public class TestDriver
 		testDropUser();
 		testLoginUser();
 		testInitiateFriendship();
+
 		testDisplayFriends();
 		testCreateGroup();
-		//testConfirmFriendship();
+		testConfirmFriendship();
 		testAddingGroup();
 		testMessageToUser();
 		testMessageToGroup();
 
 		db.Logout("603");
+
 	}
 
 	//super dependent on drops working properly, horrible dependency issues
@@ -99,7 +101,10 @@ public class TestDriver
 	}
 
 	public static void testConfirmFriendship(){
-		
+		System.out.println("Starting testConfirmFriendship\n\n\n\n");
+		db.confirmFriendship("605");
+
+		db.confirmFriendship("43");
 	}
 	public static void testDisplayFriends(){
 		db.displayFriends("55");
