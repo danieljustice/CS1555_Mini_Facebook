@@ -1,15 +1,15 @@
 --Insert all data referring to groups
 
-INSERT INTO groups values(1, 'Cs', 'CS Department Group');
-INSERT INTO groups values(2, 'Math', 'Math Department Group');
-INSERT INTO groups values(3, 'Band', 'Pitt Band Group');
-INSERT INTO groups values(4, 'JPNSE', 'Japanese Department Group');
-INSERT INTO groups values(5, 'GameDev', 'Game Development Group');
-INSERT INTO groups values(6, 'Engr', 'Engineering Group');
-INSERT INTO groups values(7, 'Music', 'Music Department Group');
-INSERT INTO groups values(8, 'Bio', 'Biology Department Group');
-INSERT INTO groups values(9, 'Youtube', 'Youtube Group');
-INSERT INTO groups values(10, 'Sports', 'Sports Group');
+INSERT INTO groups values(1, 'Cs', 'CS Department Group', 5);
+INSERT INTO groups values(2, 'Math', 'Math Department Group', 5);
+INSERT INTO groups values(3, 'Band', 'Pitt Band Group', 5);
+INSERT INTO groups values(4, 'JPNSE', 'Japanese Department Group', 6);
+INSERT INTO groups values(5, 'GameDev', 'Game Development Group', 4);
+INSERT INTO groups values(6, 'Engr', 'Engineering Group', 3);
+INSERT INTO groups values(7, 'Music', 'Music Department Group', 3);
+INSERT INTO groups values(8, 'Bio', 'Biology Department Group', 4);
+INSERT INTO groups values(9, 'Youtube', 'Youtube Group', 8);
+INSERT INTO groups values(10, 'Sports', 'Sports Group', 3);
 
 --Insert members into each group
 
