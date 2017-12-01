@@ -191,19 +191,30 @@ END;
 
 --When a profile is deleted, set references to it in messages to null
 --and delete messages that have no references to them
-CREATE OR REPLACE TRIGGER PROFILE_USER_TO_NULL
-AFTER
-DELETE ON profile
-FOR EACH ROW
-BEGIN
-	UPDATE messages SET toUserID = NULL
-		WHERE toUserID = :old.userID;
-	UPDATE messages SET fromID = NULL
-		WHERE fromID = :old.userID;
-	DELETE FROM messages
-		WHERE toUserID = NULL and fromID = NULL;
-END;
-/
+--CREATE OR REPLACE TRIGGER PROFILE_USER_TO_NULL
+--BEFORE
+--DELETE ON profile
+--FOR EACH ROW
+--BEGIN
+	--UPDATE messages SET toUserID = NULL
+		--WHERE toUserID = :old.userID;
+	--UPDATE messages SET fromID = NULL
+		--WHERE fromID = :old.userID;
+	--DELETE FROM messages
+		--WHERE toUserID = NULL and fromID = NULL;
+--END;
+--/
+
+--Delete a message where the recipient and userID have been deleted
+--CREATE OR REPLACE TRIGGER DELETE_MESSAGE
+--AFTER
+--DELETE ON profile
+--FOR EACH ROW
+--BEGIN
+	--DELETE FROM messages
+	--WHERE toUserID is null and fromID is null;
+--END;
+--/
 
 --Insert into message recipients group messages
 CREATE OR REPLACE TRIGGER ADD_GM_TO_RECIPIENTS

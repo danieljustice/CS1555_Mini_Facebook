@@ -5,9 +5,15 @@ import java.io.InputStream;
 
 public class Database
 {
+	/*Note: there are plans of instead of passing the same userID to the system everytime 
+	*it will be saved as a class variable and will be set to accordingly on Login and
+	*set to null on logout.
+	*This will be implemented in the final version of the project.
+	*/
 	private Connection dbcon;
 	private Timestamp last_login;
 	private String thisUserID;
+
 	//Client must ask for user and password themselves
 	public Database(String username, String password) throws SQLException
 	{
@@ -215,7 +221,7 @@ public class Database
 		{
 			//Get all the friends of the user
 			PreparedStatement st1 = dbcon.prepareStatement("SELECT userID1, userID2, name FROM "
-															+ "(friends JOIN profile ON (((userID1 = userID) and (userID1 <> ?)) or ((userID2 = userID) and (userID2 <> ?)))"
+															+ "(friends JOIN profile ON (((userID1 = userID) and (userID1 <> ?)) or ((userID2 = userID) and (userID2 <> ?))))"
 															+ "WHERE userID1 = ? OR userID2 = ?");
 			PreparedStatement st2 = dbcon.prepareStatement("SELECT userID, name, date_of_birth, email FROM profile WHERE userID = ?");
 
@@ -245,6 +251,7 @@ public class Database
 				//Get the profile
 				st2.setString(1, input);
 				ResultSet results = st2.executeQuery();
+				results.next();
 
 				//Display the results
 				System.out.println("Name: " + results.getString("name"));
@@ -277,21 +284,23 @@ public class Database
 	{
 		try
 		{
-			PreparedStatement st1 = dbcon.prepareStatement("INSERT INTO groups values(?, ?, ?)");
+			PreparedStatement st1 = dbcon.prepareStatement("INSERT INTO groups values(?, ?, ?, ?)");
 			PreparedStatement st2 = dbcon.prepareStatement("INSERT INTO groupMembership values(?, ?, 'manager')");
 
 			//Not sure how to determine gID
 			PreparedStatement st3 = dbcon.prepareStatement("SELECT MAX(gID) AS max FROM groups");
 			ResultSet gID = st3.executeQuery();
 			if(gID.next())
-				st1.setInt(1, gID.getInt("max"));
+				st1.setInt(1, gID.getInt("max") + 1);
 			else
 				st1.setInt(1, 1);
 			st1.setString(2, name);
 			st1.setString(3, desc);
+			st1.setInt(4, limit);
 			st1.executeUpdate();
 
 			//Add the user to the group as a manager
+			st2.setInt(1, gID.getInt("max") + 1);
 			st2.setString(2, userID);
 			st2.executeUpdate();
 		}
@@ -618,12 +627,12 @@ public class Database
  	/*Display top K who have sent to received the highest number of messages during for the past x
  	months. x and K are input parameters to this function.*/
  	public void topMessages(int k, int x)
- 	{
+ 	{/*
  		try
  		{
  			//Set up the query
  			PreparedStatement st1 = dbcon.prepareStatement("SELECT * FROM "
- 														+ "(SELECT toUserID, COUNT(msgId) as mCount from messages WHERE dateSent >= ? GROUP BY toUserID, mCount ORDER BY mCount DESC) "
+ 														+ "(SELECT toUserID, COUNT(msgId) as mCount from (messageRecipient JOIN messages ON (messageRecipient.userID = messages.toUserID)) WHERE dateSent >= ? GROUP BY toUserID, mCount ORDER BY mCount DESC) "
  														+ "WHERE rownum <= ? ORDER BY rownum");
  			st1.setInt(2, k);
 			
@@ -654,7 +663,7 @@ public class Database
  				System.out.println("SQLState = "+ e1.getErrorCode());
  				e1 = e1.getNextException();
  			}
- 		}
+ 		}*/
  	}
 
 	/*Remove a user and all of their information from the system. When a user is removed, the system
@@ -688,14 +697,14 @@ public class Database
 
 	/*This option should cleanly shut down and exit the program after marking the time of the user's
 logout in the profile relation,*/
-	public void Logout()
+	public void Logout(String userID)
 	{
 		//Fix so it can add proper date
 
 		try
 		{
-			PreparedStatement st2 = dbcon.prepareStatement("UPDATE profile SET lastlogin = TO_TIMESTAMP(CURRENT_TIMESTAMP, 'YYYY-MM-DD HH24:MI:SS') WHERE userID = ?");
-			st2.setString(1, thisUserID);
+			PreparedStatement st2 = dbcon.prepareStatement("UPDATE profile SET lastlogin = CURRENT_TIMESTAMP WHERE userID = ?");
+			st2.setString(1, userID);
 			st2.executeUpdate();
 			closeDB();
 		}
