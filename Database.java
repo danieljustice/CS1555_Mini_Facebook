@@ -240,11 +240,13 @@ public class Database
 				{
 					System.out.println("Name: " + friends.getString("name") + ", " + friends.getString("userID2"));
 					list.add(friends.getString("userID2"));
+					getFriends(friends.getString("userID2"), list);
 				}
 				else
 				{
 					System.out.println("Name: " + friends.getString("name") + ", " + friends.getString("userID1"));
 					list.add(friends.getString("userID1"));
+					getFriends(friends.getString("userID1"), list);
 				}
 			}
 
@@ -273,6 +275,49 @@ public class Database
 				System.out.println("Enter a profileID to request a profile(enter 0 to exit):");
 				input = scan.nextLine();
 			}
+		}
+		catch(SQLException e1)
+		{
+			//Print errors
+			System.out.println("SQL Error");
+			while(e1 != null)
+			{
+				System.out.println("Message = "+ e1.getMessage());
+				System.out.println("SQLState = "+ e1.getSQLState());
+				System.out.println("SQLState = "+ e1.getErrorCode());
+				e1 = e1.getNextException();
+			}
+		}
+	}
+
+	//Helper method for getting friends of friends for displayFriends
+	private void getFriends(String userID, ArrayList<String> list)
+	{
+		try
+		{
+			PreparedStatement st1 = dbcon.prepareStatement("SELECT userID1, userID2, name FROM "
+															+ "(friends JOIN profile ON (((userID1 = userID) and (userID1 <> ?)) or ((userID2 = userID) and (userID2 <> ?))))"
+															+ "WHERE userID1 = ? OR userID2 = ?");
+			st1.setString(1, userID);
+			st1.setString(2, userID);
+			st1.setString(3, userID);
+			st1.setString(4, userID);
+			ResultSet friends = st1.executeQuery();
+
+			while(friends.next())
+			{
+				if(userID.equalsIgnoreCase(friends.getString("userID1")))
+				{
+					System.out.println("\tName: " + friends.getString("name") + ", " + friends.getString("userID2"));
+					list.add(friends.getString("userID2"));
+				}
+				else
+				{
+					System.out.println("\tName: " + friends.getString("name") + ", " + friends.getString("userID1"));
+					list.add(friends.getString("userID1"));
+				}
+			}
+
 		}
 		catch(SQLException e1)
 		{
