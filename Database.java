@@ -113,11 +113,11 @@ public class Database
 	//should be requested of the user before an entry is inserted into the pendingFriends relation,
 	//and success or failure feedback is displayed for the user.
 
-	public boolean initiateFriendship(String fromID, String toID)
+	public boolean initiateFriendship(String toID)
 	{
 		//Using method overload here to have a version of this method that
 		//can be easily tested
-		return initiateFriendship(fromID, toID, System.in);
+		return initiateFriendship(thisUserID, toID, System.in);
 	}
 
 	//Allows us to feed an inputstream into this method so that we can automate the tests
@@ -172,8 +172,8 @@ public class Database
 			return false;
 		}
 	}
-	public void confirmFriendship(String userID){
-		confirmFriendship(userID, System.in);
+	public void confirmFriendship(){
+		confirmFriendship(thisUserID, System.in);
 	}
 	//This task should first display a formatted, numbered list of all outstanding friends and group
 	//requests with an associated messages. Then, the user should be prompted for a number of the
@@ -329,7 +329,7 @@ public class Database
 	userID or exit browsing and return to the main menu by entering 0 as a userID. When selected,
 	a friend's profile should be displayed in a nicely formatted way, after which the user should be
 	prompted to either select to retrieve another friend's profile or return to the main menu.*/
-	public void displayFriends(String userID)
+	public void displayFriends()
 	{
 		try
 		{
@@ -339,10 +339,10 @@ public class Database
 															+ "WHERE userID1 = ? OR userID2 = ?");
 			PreparedStatement st2 = dbcon.prepareStatement("SELECT userID, name, date_of_birth, email FROM profile WHERE userID = ?");
 
-			st1.setString(1, userID);
-			st1.setString(2, userID);
-			st1.setString(3, userID);
-			st1.setString(4, userID);
+			st1.setString(1, thisUserID);
+			st1.setString(2, thisUserID);
+			st1.setString(3, thisUserID);
+			st1.setString(4, thisUserID);
 			ResultSet friends = st1.executeQuery();
 
 			//Display the friends
@@ -350,7 +350,7 @@ public class Database
 			ArrayList<String> list = new ArrayList<String>();
 			while(friends.next())
 			{
-				if(userID.equalsIgnoreCase(friends.getString("userID1")))
+				if(thisUserID.equalsIgnoreCase(friends.getString("userID1")))
 				{
 					System.out.println("Name: " + friends.getString("name") + ", " + friends.getString("userID2"));
 					list.add(friends.getString("userID2"));
@@ -420,7 +420,7 @@ public class Database
 
 			while(friends.next())
 			{
-				if(userID.equalsIgnoreCase(friends.getString("userID1")))
+				if(thisUserID.equalsIgnoreCase(friends.getString("userID1")))
 				{
 					System.out.println("\tName: " + friends.getString("name") + ", " + friends.getString("userID2"));
 					list.add(friends.getString("userID2"));
@@ -449,7 +449,7 @@ public class Database
 
 	/*Given a name, description, and membership limit, add a new group to the system, add the
 	user as its first member with the role manager.*/
-	public void createGroup(String name, String desc, int limit, String userID)
+	public void createGroup(String name, String desc, int limit)
 	{
 		try
 		{
@@ -470,7 +470,7 @@ public class Database
 
 			//Add the user to the group as a manager
 			st2.setInt(1, gID.getInt("max") + 1);
-			st2.setString(2, userID);
+			st2.setString(2, thisUserID);
 			st2.executeUpdate();
 		}
 		catch(SQLException e1)
@@ -490,7 +490,7 @@ public class Database
 	/*Given a user and a group, create a pending request of adding to group (if not violate the
 	group's membership limit). The user should be prompted to enter a message to be sent along
 	with the request and inserted in the pendingGroupmembers relation.*/
-	public void initiateAddingGroup(String userID, String gID)
+	public void initiateAddingGroup(String gID)
 	{
 		try
 		{
@@ -501,7 +501,7 @@ public class Database
 			//Add the request to the database
 			PreparedStatement st1 = dbcon.prepareStatement("INSERT INTO pendingGroupmembers values(?, ?, ?)");
 			st1.setString(1, gID);
-			st1.setString(2, userID);
+			st1.setString(2, thisUserID);
 			st1.setString(3, msg);
 			st1.executeUpdate();
 		}
@@ -524,7 +524,7 @@ public class Database
 	message, which could be multi-lined. Once entered, the message should be 'sent' to the user
 	by adding appropriate entries into the messages and messageRecipients relations by creating
 	a trigger. The user should lastly be shown success or failure feedback.*/
-	public void sendMessageToUser(String toID, String fromID)
+	public void sendMessageToUser(String toID)
 	{
 		//Prompt the user for a message to send
 		//Change so it can be multilined
@@ -542,7 +542,7 @@ public class Database
 				st1.setInt(1, id.getInt("max") + 1);
 			else
 				st1.setInt(1, 1);
-			st1.setString(2, fromID);
+			st1.setString(2, thisUserID);
 			st1.setString(3, msg);
 			st1.setString(4, toID);
 			st1.executeUpdate();
@@ -574,7 +574,7 @@ public class Database
 	to put the group ID to ToGroupID in the table of messages and use a trigger to populate the
 	messageRecipient table with proper user ID information as defined by the groupMembership
 	relation.*/
-	public void sendMessageToGroup(String userID, String toGroupID)
+	public void sendMessageToGroup(String toGroupID)
 	{
 		try
 		{
@@ -585,7 +585,7 @@ public class Database
 
 			//First check if the user is in the group
 			PreparedStatement st1 = dbcon.prepareStatement("SELECT gID FROM groupMembership WHERE userID = ?");
-			st1.setString(1, userID);
+			st1.setString(1, thisUserID);
 			ResultSet groups = st1.executeQuery();
 
 			boolean found = false;
@@ -609,7 +609,7 @@ public class Database
 					st2.setInt(1, id.getInt("max") + 1);
 				else
 					st2.setInt(1, 1);
-				st2.setString(2, userID);
+				st2.setString(2, thisUserID);
 				st2.setString(3, msg);
 				st2.setString(4, toGroupID);
 				st2.executeUpdate();
@@ -637,13 +637,13 @@ public class Database
 
 	/*When the user selects this option, the entire contents of every message sent to the user should
 	be displayed in a nicely formatted way.*/
-	public void displayMessages(String userID)
+	public void displayMessages()
 	{
 		try
 		{
 			//Get all the messages sent to the user and order by dateSent descending
 			PreparedStatement st1 = dbcon.prepareStatement("SELECT fromID, message, dateSent FROM (messageRecipient JOIN messages ON (messageRecipient.userID = messages.toUserID)) WHERE toUserID = ? ORDER BY dateSent DESC");
-			st1.setString(1, userID);
+			st1.setString(1, thisUserID);
 			ResultSet results = st1.executeQuery();
 
 			//Loop through and display the results
@@ -669,13 +669,13 @@ public class Database
 
 	/*This should display messages in the same fashion as the previous task except that only those
 	messages sent since the last time the user logged into the system should be displayed.*/
-	public void displayNewMessages(String userID)
+	public void displayNewMessages()
 	{
 		try
 		{
 			//Get all messages sent to the user since last login time
 			PreparedStatement st1 = dbcon.prepareStatement("SELECT fromID, message, dateSent FROM (messageRecipient JOIN messages ON (messageRecipient.userID = messages.toUserID)) WHERE toUserID = ? and dateSent > ? ORDER BY dateSent DESC");
-			st1.setString(1, userID);
+			st1.setString(1, thisUserID);
 			st1.setTimestamp(2, last_login);
 			ResultSet results = st1.executeQuery();
 
@@ -840,15 +840,17 @@ public class Database
 	messages require special handling because they are owned by both sender and receiver. Therefore,
 	a message is deleted only when both he sender and all receivers are deleted. Attention
 	should be paid handling integrity constraints.*/
-	public int dropUser(int userID)
+	public boolean dropUser()
 	{
 		int rowsDropped = 0;
 		try
 		{
 			//Have triggers handle the details of this
 			PreparedStatement st1 = dbcon.prepareStatement("DELETE FROM profile WHERE userID = ?");
-			st1.setInt(1, userID);
+			st1.setString(1, thisUserID);
 			rowsDropped = st1.executeUpdate();
+			dbcon.close();
+			thisUserID = null;
 		}
 		catch(SQLException e1)
 		{
@@ -860,22 +862,24 @@ public class Database
 				System.out.println("SQLState = "+ e1.getErrorCode());
 				e1 = e1.getNextException();
 			}
+			return false;
 		}
-		return rowsDropped;
+		return true;
 	}
 
 	/*This option should cleanly shut down and exit the program after marking the time of the user's
 logout in the profile relation,*/
-	public void Logout(String userID)
+	public void Logout()
 	{
 		//Fix so it can add proper date
 
 		try
 		{
 			PreparedStatement st2 = dbcon.prepareStatement("UPDATE profile SET lastlogin = CURRENT_TIMESTAMP WHERE userID = ?");
-			st2.setString(1, userID);
+			st2.setString(1, thisUserID);
 			st2.executeUpdate();
 			closeDB();
+			thisUserID = null;
 		}
 		catch(SQLException e1)
 		{
