@@ -17,8 +17,14 @@ public class SocialPanther
 		{
 			displayMenu();
 			String input = scan.nextLine();
-			if(!input.equals("0") && !input.equals("1"))
-				System.out.println("Invalid Input");
+			if(input.equals("0"))
+				db.Logout();
+			else if(input.equals("1"))
+				db.displayFriends();
+			else if(input.equals("2"))
+				db.confirmFriendship();
+			else
+				System.out.println("Invalid Input\n");
 		}
 	}
 
@@ -27,6 +33,7 @@ public class SocialPanther
 		System.out.println("Welcome to SocialPanther! \nSelect one of the following to do something:");
 		System.out.println("0.\tLog out");
 		System.out.println("1.\tDisplay Friends");
+		System.out.println("2.\tConfirm Pending Requests");
 	}
 
 	private static void prompt_login() throws SQLException
