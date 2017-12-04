@@ -27,7 +27,7 @@ public class Database
 
 	//Given a name, email address, and date of birth, add a new user to the system by inserting as
 	//new entry in the profile relation.
-	public int createUser(String userID, String name, String password, String dob, String email)
+	public int createUser(String userID, String name, String password, java.sql.Date dob, String email)
 	{	
 		//Add something to convert the date to a timestamp
 		//success will be returned at end of method, -1 for fail, 0 or greater for success
@@ -38,7 +38,7 @@ public class Database
 			st1.setString(1, userID);
 			st1.setString(2, name);
 			st1.setString(3, password);
-			st1.setString(4, dob);
+			st1.setDate(4, dob);
 			st1.setString(5, email);
 			success = st1.executeUpdate();
 		}
