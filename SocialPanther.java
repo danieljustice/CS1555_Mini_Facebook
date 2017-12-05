@@ -60,7 +60,7 @@ public class SocialPanther
 			{
 				db.dropUser();
 				logged_in = false;
-				System.out.println("It's a shame to see you go. We hope you will join again in the future!")
+				System.out.println("It's a shame to see you go. We hope you will join again in the future!");
 			}
 			else
 				System.out.println("Invalid Input\n");
@@ -123,7 +123,7 @@ public class SocialPanther
 	//Prompt the user to search for another user
 	private static void userSearch() throws SQLException
 	{
-		System.out.println("Enter the things you would like to search for:")
+		System.out.println("Enter the things you would like to search for:");
 		Scanner scan = new Scanner(System.in);
 		db.searchForUser(scan.nextLine());
 	}

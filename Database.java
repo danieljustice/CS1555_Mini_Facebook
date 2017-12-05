@@ -420,7 +420,7 @@ public class Database
 
 			while(friends.next())
 			{
-				if(thisUserID.equalsIgnoreCase(friends.getString("userID1")))
+				if(userID.equalsIgnoreCase(friends.getString("userID1")))
 				{
 					System.out.println("\tName: " + friends.getString("name") + ", " + friends.getString("userID2"));
 					list.add(friends.getString("userID2"));
