@@ -27,11 +27,11 @@ public class Database
 
 	//Given a name, email address, and date of birth, add a new user to the system by inserting as
 	//new entry in the profile relation.
-	public int createUser(String userID, String name, String password, java.sql.Date dob, String email)
+	public boolean createUser(String userID, String name, String password, java.sql.Date dob, String email)
 	{	
 		//Add something to convert the date to a timestamp
 		//success will be returned at end of method, -1 for fail, 0 or greater for success
-		int success = -1;
+		//int success = -1;
 		try
 		{
 			PreparedStatement st1 = dbcon.prepareStatement("INSERT INTO profile values(?, ?, ?, ?, NULL, ?)");
@@ -40,7 +40,8 @@ public class Database
 			st1.setString(3, password);
 			st1.setDate(4, dob);
 			st1.setString(5, email);
-			success = st1.executeUpdate();
+			st1.executeUpdate();
+			return true;
 		}
 		catch(SQLException e1)
 		{
@@ -52,8 +53,8 @@ public class Database
 				System.out.println("SQLState = "+ e1.getErrorCode());
 				e1 = e1.getNextException();
 			}
+			return false;
 		}
-		return success;
 	}
 
 
@@ -420,7 +421,7 @@ public class Database
 
 			while(friends.next())
 			{
-				if(thisUserID.equalsIgnoreCase(friends.getString("userID1")))
+				if(userID.equalsIgnoreCase(friends.getString("userID1")))
 				{
 					System.out.println("\tName: " + friends.getString("name") + ", " + friends.getString("userID2"));
 					list.add(friends.getString("userID2"));
