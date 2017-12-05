@@ -96,7 +96,7 @@ public class SocialPanther
 		Scanner scan = new Scanner(System.in);
 		try
 		{
-			System.out.println("Enter how many users you want in your results:");
+			System.out.println("Enter how many users do you want in your results:");
 			int k = scan.nextInt();
 			System.out.println("Enter how many months in the past you want your results to go back:");
 			int x = scan.nextInt();
@@ -249,120 +249,133 @@ public class SocialPanther
 	private static void prompt_createUser() throws SQLException
 	{
 		Scanner scan = new Scanner(System.in);
-		//Get user's name
-		String name = null;
+		boolean success = false;
+		String userID;
+		String password;
 		do
 		{
-			System.out.println("Enter your name: ");
-			name = scan.nextLine();
-		}while(name.length() > 20 || name.length() == 0);
-
-		//Get user's userID
-		String userID = null;
-		do
-		{
-			System.out.println("Enter your userID: ");
-			userID = scan.nextLine();
-		}while(userID.length() > 20 || userID.length() == 0);
-
-		//Get user's email
-		String email = null;
-		do
-		{
-			System.out.println("Enter your email: ");
-			email = scan.nextLine();
-		}while(email.length() > 20 || email.length() == 0);
-
-		//Get the user's password
-		String password = null;
-		do
-		{
-			System.out.println("Enter your password: ");
-			password = scan.nextLine();
-		}while(password.length() > 20 || password.length() == 0);
-
-		//Get the user's date of birth
-		//String dob = null;
-		
-		//Ask for the month of birth
-		boolean valid = false;
-		int month = 0;
-		while(!valid)
-		{
-			try
+			//Get user's name
+			String name = null;
+			do
 			{
-				System.out.println("Enter your month of birth as an integer:");
-				month = scan.nextInt();
+				System.out.println("Enter your name: ");
+				name = scan.nextLine();
+			}while(name.length() > 20 || name.length() == 0);
 
-				//Do an error check on the month
-				if(month > 12 || month < 1)
+			//Get user's userID
+			userID = null;
+			do
+			{
+				System.out.println("Enter your userID: ");
+				userID = scan.nextLine();
+			}while(userID.length() > 20 || userID.length() == 0);
+
+			//Get user's email
+			String email = null;
+			do
+			{
+				System.out.println("Enter your email: ");
+				email = scan.nextLine();
+			}while(email.length() > 20 || email.length() == 0);
+
+			//Get the user's password
+			password = null;
+			do
+			{
+				System.out.println("Enter your password: ");
+				password = scan.nextLine();
+			}while(password.length() > 20 || password.length() == 0);
+
+			//Get the user's date of birth
+			//String dob = null;
+			
+			//Ask for the month of birth
+			boolean valid = false;
+			int month = 0;
+			while(!valid)
+			{
+				try
 				{
-					System.out.println("Invalid Input: Please enter an integer between 1 and 12 for your month of birth");
+					System.out.println("Enter your month of birth as an integer:");
+					month = scan.nextInt();
+
+					//Do an error check on the month
+					if(month > 12 || month < 1)
+					{
+						System.out.println("Invalid Input: Please enter an integer between 1 and 12 for your month of birth");
+					}
+					else
+						valid = true;
 				}
-				else
+				catch(InputMismatchException e1)
+				{
+					System.out.println("Invalid Input: Please enter an integer");
+					scan.next();
+					continue;
+				}
+			}
+
+			//Ask for the day of birth
+			valid = false;
+			int day = 0;
+			while(!valid)
+			{
+				try
+				{
+					System.out.println("Enter your day of birth: ");
+					day = scan.nextInt();
+
+					//Do an error check on the day
+					if((month == 1 || month == 3 || month == 5 || month == 7 || month == 8 || month == 10 || month == 12) && (day < 1 || day > 31))
+					{
+						System.out.println("Invalid Input: Please enter a value between 1 and 31");
+					}
+					else if((month == 4 || month == 6 || month == 9 || month == 11) && (day < 1 || day > 30))
+					{
+						System.out.println("Invalid Input: Please enter a value between 1 and 30");
+					}
+					else if(month == 2 && (day < 1 || day > 29))
+					{
+						System.out.println("Invalid Input: Please enter a value between 1 and 29");
+					}
+					else
+					{
+						valid = true;
+					}
+				}
+				catch(InputMismatchException e2)
+				{
+					System.out.println("Invalid Input: Please enter an integer");
+					scan.next();
+					continue;
+				}
+			}
+
+			//Ask for the year of birth
+			valid = false;
+			int year = 0;
+			while(!valid)
+			{
+				try
+				{
+					System.out.println("Enter your year of birth:");
+					year = scan.nextInt();
 					valid = true;
-			}
-			catch(InputMismatchException e1)
-			{
-				System.out.println("Invalid Input: Please enter an integer");
-			}
-		}
-
-		//Ask for the day of birth
-		valid = false;
-		int day = 0;
-		while(!valid)
-		{
-			try
-			{
-				System.out.println("Enter your day of birth: ");
-				day = scan.nextInt();
-
-				//Do an error check on the day
-				if((month == 1 || month == 3 || month == 5 || month == 7 || month == 8 || month == 10 || month == 12) && (day < 1 || day > 31))
-				{
-					System.out.println("Invalid Input: Please enter a value between 1 and 31");
 				}
-				else if((month == 4 || month == 6 || month == 9 || month == 11) && (day < 1 || day > 30))
+				catch(InputMismatchException e3)
 				{
-					System.out.println("Invalid Input: Please enter a value between 1 and 30");
-				}
-				else if(month == 2 && (day < 1 || day > 29))
-				{
-					System.out.println("Invalid Input: Please enter a value between 1 and 29");
-				}
-				else
-				{
-					valid = true;
+					System.out.println("Invalid Input: Please enter an integer");
+					scan.next();
+					continue;
 				}
 			}
-			catch(InputMismatchException e2)
-			{
-				System.out.println("Invalid Input: Please enter an integer");
-			}
-		}
 
-		//Ask for the year of birth
-		valid = false;
-		int year = 0;
-		while(!valid)
-		{
-			try
-			{
-				System.out.println("Enter your year of birth:");
-				year = scan.nextInt();
-				valid = true;
-			}
-			catch(InputMismatchException e3)
-			{
-				System.out.println("Invalid Input: Please enter an integer");
-			}
-		}
+			java.sql.Date dob = new java.sql.Date(year, month, day);
 
-		java.sql.Date dob = new java.sql.Date(year, month, day);
-
-		//Create to new account
-		db.createUser(userID, name, password, dob, email);
+			//Create to new account
+			success = db.createUser(userID, name, password, dob, email);
+		}while(!success);
 		logged_in = db.loginUser(userID, password);
+	
 	}
 }
