@@ -215,7 +215,7 @@ public class SocialPanther
 		//Log in the user
 		if(input.equals("1"))
 		{
-			System.out.println("Enter your SocialPanther username: ");
+			System.out.println("Enter your SocialPanther userID: ");
 			String username = scan.nextLine();
 
 			System.out.println("Enter your SocialPanther password: ");
