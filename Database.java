@@ -643,6 +643,7 @@ public class Database
 		try
 		{
 			//Get all the messages sent to the user and order by dateSent descending
+			System.out.println("User messages:");
 			PreparedStatement st1 = dbcon.prepareStatement("SELECT fromID, message, dateSent FROM (messageRecipient JOIN messages ON (messageRecipient.userID = messages.toUserID)) WHERE toUserID = ? ORDER BY dateSent DESC");
 			st1.setString(1, thisUserID);
 			ResultSet results = st1.executeQuery();
@@ -653,6 +654,29 @@ public class Database
 				System.out.println("From " + results.getString("fromID"));
 				System.out.println("Sent " + results.getDate("dateSent"));
 				System.out.println(results.getString("message"));
+			}
+
+			System.out.println("Group messages:");
+			//Get what groups the user is in
+			PreparedStatement st2 = dbcon.prepareStatement("SELECT gID FROM groupMembership WHERE userID = ?");
+			st2.setString(1, thisUserID);
+			ResultSet groups = st2.executeQuery();
+
+			PreparedStatement st3 = dbcon.prepareStatement("SELECT fromID, message, dateSent FROM (groups JOIN messages ON(groups.gID = messages.toGroupID)) WHERE toGroupID = ? ORDER BY dateSent DESC");
+
+			while(groups.next())
+			{
+				System.out.println("------------------------------------------------------------------------------------------------------------");
+				System.out.println("Group " + groups.getInt("gID"));
+				st3.setInt(1, groups.getInt("gID"));
+				ResultSet msg = st3.executeQuery();
+
+				while(msg.next())
+				{
+					System.out.println("From " + msg.getString("fromID"));
+					System.out.println("Sent on " + msg.getDate("dateSent"));
+					System.out.println(msg.getString("message"));
+				}
 			}
 		}
 		catch(SQLException e1)
@@ -675,6 +699,7 @@ public class Database
 		try
 		{
 			//Get all messages sent to the user since last login time
+			System.out.println("New user messages:");
 			PreparedStatement st1 = dbcon.prepareStatement("SELECT fromID, message, dateSent FROM (messageRecipient JOIN messages ON (messageRecipient.userID = messages.toUserID)) WHERE toUserID = ? and dateSent > ? ORDER BY dateSent DESC");
 			st1.setString(1, thisUserID);
 			st1.setTimestamp(2, last_login);
@@ -686,6 +711,30 @@ public class Database
 				System.out.println("From " + results.getString("fromID"));
 				System.out.println("Sent " + results.getDate("dateSent"));
 				System.out.println(results.getString("message"));
+			}
+
+			System.out.println("New group messages:");
+			//Get what groups the user is in
+			PreparedStatement st2 = dbcon.prepareStatement("SELECT gID FROM groupMembership WHERE userID = ?");
+			st2.setString(1, thisUserID);
+			ResultSet groups = st2.executeQuery();
+
+			PreparedStatement st3 = dbcon.prepareStatement("SELECT fromID, message, dateSent FROM (groups JOIN messages ON(groups.gID = messages.toGroupID)) WHERE toGroupID = ? and dateSent > ? ORDER BY dateSent DESC");
+
+			while(groups.next())
+			{
+				System.out.println("------------------------------------------------------------------------------------------------------------");
+				System.out.println("Group " + groups.getInt("gID"));
+				st3.setInt(1, groups.getInt("gID"));
+				st3.setTimestamp(2, last_login);
+				ResultSet msg = st3.executeQuery();
+
+				while(msg.next())
+				{
+					System.out.println("From " + msg.getString("fromID"));
+					System.out.println("Sent on " + msg.getDate("dateSent"));
+					System.out.println(msg.getString("message"));
+				}
 			}
 		}
 		catch(SQLException e1)
@@ -718,11 +767,14 @@ public class Database
 			}
 
 			//Prepare the query
-			PreparedStatement st1 = dbcon.prepareStatement("SELECT userID, name FROM profile WHERE name LIKE ?");
+			PreparedStatement st1 = dbcon.prepareStatement("SELECT userID, name FROM profile WHERE REGEXP_LIKE(name, ?)");
+			PreparedStatement st2 = dbcon.prepareStatement("SELECT userID, name FROM profile WHERE REGEXP_LIKE(userID, ?)");
+			PreparedStatement st3 = dbcon.prepareStatement("SELECT userID, name FROM profile WHERE REGEXP_LIKE(email, ?)");
 
 			System.out.println("Here are your results:");
 
-			//Loop over tokens
+			//Loop over tokens for name
+			System.out.println("Matched on name:");
 			for(int i = 0; i < list.size(); i++)
 			{
 				st1.setString(1, list.get(i));
@@ -735,6 +787,41 @@ public class Database
 					System.out.println("userID: " + results.getString("userID") + "\n");
 				}
 			}
+			System.out.println("============================================");
+			
+			//Matched on userID
+			System.out.println("Matched on userID:");
+			for(int i = 0; i < list.size(); i++)
+			{
+				st2.setString(1, list.get(i));
+				ResultSet results = st2.executeQuery();
+
+				//Print results of each set
+				while(results.next())
+				{
+					System.out.println("Name: " + results.getString("name"));
+					System.out.println("userID: " + results.getString("userID") + "\n");
+				}
+			}
+			System.out.println("============================================");
+
+			//Matched on email
+			System.out.println("Matched on email:");
+			for(int i = 0; i < list.size(); i++)
+			{
+				st3.setString(1, list.get(i));
+				ResultSet results = st3.executeQuery();
+
+				//Print results of each set
+				while(results.next())
+				{
+					System.out.println("Name: " + results.getString("name"));
+					System.out.println("userID: " + results.getString("userID") + "\n");
+				}
+			}
+			System.out.println("============================================");
+
+
 		}
 		catch(SQLException e1)
 		{
@@ -802,23 +889,27 @@ public class Database
  		{
  			//Set up the query
  			PreparedStatement st1 = dbcon.prepareStatement("SELECT * FROM "
- 														+ "(SELECT toUserID, COUNT(msgId) as mCount from (messageRecipient JOIN messages ON (messageRecipient.userID = messages.toUserID)) WHERE dateSent >= ? GROUP BY toUserID, mCount ORDER BY mCount DESC) "
+ 														+ "(SELECT fromID, COUNT(msgId) as \"mCount\" FROM messages WHERE dateSent >= ? GROUP BY fromID ORDER BY \"mCount\" DESC) "
  														+ "WHERE rownum <= ? ORDER BY rownum");
  			st1.setInt(2, k);
 			
  			//Calculate the date from which to get the messages from
  			Calendar current = Calendar.getInstance();
- 			current.add(current.get(Calendar.MONTH), -x);
- 			java.sql.Date date = new java.sql.Date(current.get(Calendar.YEAR), current.get(Calendar.MONTH), current.get(Calendar.DAY_OF_MONTH));
+ 			//java.sql.Date date2 = new java.sql.Date(current.getTimeInMillis());
+ 			//System.out.println(current.get(Calendar.YEAR));
+ 			current.add(Calendar.MONTH, -x);
+ 			//System.out.println(current.get(Calendar.MONTH));
+ 			java.sql.Date date = new java.sql.Date(current.getTimeInMillis());
+ 			System.out.println(date);
  			st1.setDate(1, date);
  			ResultSet result = st1.executeQuery();
 
  			//Display the results
- 			System.out.println("Top " + k + " messaged users in the past " + x + " months:");
+ 			System.out.println("Top " + k + " message sending users in the past " + x + " months:");
  			int i = 1;
  			while(result.next())
  			{
- 				System.out.println(i + ".\t" + result.getString("toUserID") + ": " + result.getInt("mCount"));
+ 				System.out.println(i + ".\t" + result.getString("fromID") + ": " + result.getInt("mCount"));
  				i++;
  			}
  		}
