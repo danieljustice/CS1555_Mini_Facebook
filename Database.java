@@ -1014,10 +1014,14 @@ logout in the profile relation,*/
 		try
 		{
 			//Get the friends of userID1
-			if(results.size() <= 4)
+			//System.out.println(results.size());
+			if(results.size() < 3)
 			{
+				//System.out.println("Adding " + userID1);
 				results.add(userID1);
-				PreparedStatement st1 = dbcon.prepareStatement("SELECT userID1, userID2 FROM friends WHERE userID1 = ? OR userID2 = ?");
+				//System.out.println(results);
+
+				PreparedStatement st1 = dbcon.prepareStatement("SELECT userID1, userID2 FROM friends WHERE userID1 = ? OR userID2 = ?", ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
 				st1.setString(1, userID1);
 				st1.setString(2, userID1);
 				ResultSet friends = st1.executeQuery();
@@ -1033,12 +1037,12 @@ logout in the profile relation,*/
 
 				//UserID2 was not found, so recursively check the next level of friends
 				friends.beforeFirst();
-				ArrayList<String> path = new ArrayList<String>();
+				ArrayList<String> path = null;
 				while(friends.next())
 				{
-					if(userID1.equals(friends.getString("userID1")))
+					if(userID1.equals(friends.getString("userID1")) && !results.contains("userID2"))
 						path = tresDegrees(friends.getString("userID2"), userID2, results);
-					else
+					else if(!results.contains("userID1"))
 						path = tresDegrees(friends.getString("userID1"), userID2, results);
 					if(path != null)
 						break;
@@ -1051,6 +1055,8 @@ logout in the profile relation,*/
 				else
 				{
 					results.remove(results.size() - 1);
+					//System.out.println("Removing " + userID1);
+					//System.out.println(results);
 					return null;
 				}
 			}
