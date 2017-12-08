@@ -221,6 +221,20 @@ public class SocialPanther
 		return db != null;
 	}
 
+	private static void log_in_user(){
+
+		System.out.println("Enter your SocialPanther userID: ");
+		String username = scanner.nextLine();
+
+		System.out.println("Enter your SocialPanther password: ");
+		String pass = scanner.nextLine();
+
+		logged_in = db.loginUser(username, pass);
+		if(!logged_in){
+			System.out.println("Username or password was incorrect.");
+		}
+	}
+
 	//Prompt the user to login
 	private static int prompt_login() throws SQLException
 	{
@@ -235,33 +249,18 @@ public class SocialPanther
 		//Log in the user
 		if(input.equals("1"))
 		{
-			System.out.println("Enter your SocialPanther userID: ");
-			String username = scanner.nextLine();
-
-			System.out.println("Enter your SocialPanther password: ");
-			String pass = scanner.nextLine();
-
-			logged_in = db.loginUser(username, pass);
-
-			//Check that user has valid credentials
-			while(!logged_in)
-			{
-				System.out.println("Username or password was incorrect.");
-
-				System.out.println("Enter your SocialPanther username: ");
-				username = scanner.nextLine();
-
-				System.out.println("Enter your SocialPanther password: ");
-				pass = scanner.nextLine();
-
-				logged_in = db.loginUser(username, pass);
-			}
+			log_in_user();
 		}
 		else if(input.equals("0"))
 		{
 			//Create a new user and automatically login the user
 			prompt_createUser();
 		}
+
+		if(!logged_in && !input.equals("-1")){
+			prompt_login();
+		}
+
 		return Integer.parseInt(input);
 	}
 
@@ -272,8 +271,8 @@ public class SocialPanther
 		boolean success = false;
 		String userID;
 		String password;
-		do
-		{
+		// do
+		// {
 			//Get user's name
 			String name = null;
 			do
@@ -318,7 +317,7 @@ public class SocialPanther
 				{
 					System.out.println("Enter your month of birth as an integer:");
 					month = scanner.nextInt();
-
+					scanner.nextLine();
 					//Do an error check on the month
 					if(month > 12 || month < 1)
 					{
@@ -344,7 +343,7 @@ public class SocialPanther
 				{
 					System.out.println("Enter your day of birth: ");
 					day = scanner.nextInt();
-
+					scanner.nextLine();
 					//Do an error check on the day
 					if((month == 1 || month == 3 || month == 5 || month == 7 || month == 8 || month == 10 || month == 12) && (day < 1 || day > 31))
 					{
@@ -380,6 +379,7 @@ public class SocialPanther
 				{
 					System.out.println("Enter your year of birth:");
 					year = scanner.nextInt();
+					scanner.nextLine();
 					valid = true;
 				}
 				catch(InputMismatchException e3)
@@ -394,8 +394,10 @@ public class SocialPanther
 
 			//Create to new account
 			success = db.createUser(userID, name, password, dob, email);
-		}while(!success);
-		logged_in = db.loginUser(userID, password);
+		// }while(!success);
+		if(success){
+			logged_in = db.loginUser(userID, password);
+		}
 	
 	}
 }
