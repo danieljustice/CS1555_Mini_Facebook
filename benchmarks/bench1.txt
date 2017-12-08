@@ -1,12 +1,21 @@
 jcc117
 3918861
 0
-bob
-bb77
-bb7@pitt.edu
-bb
+Jordan
+jcc117
+jcc117@pitt.edu
+yoyo
+a
 8
+a
 8
+a
 1999
+slsls
 0
+1
+jcc117
+yoyo
+0
+-1
 
