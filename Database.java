@@ -941,7 +941,7 @@ public class Database
 			PreparedStatement st1 = dbcon.prepareStatement("DELETE FROM profile WHERE userID = ?");
 			st1.setString(1, thisUserID);
 			rowsDropped = st1.executeUpdate();
-			dbcon.close();
+			// dbcon.close();
 			thisUserID = null;
 		}
 		catch(SQLException e1)
@@ -970,7 +970,7 @@ logout in the profile relation,*/
 			PreparedStatement st2 = dbcon.prepareStatement("UPDATE profile SET lastlogin = CURRENT_TIMESTAMP WHERE userID = ?");
 			st2.setString(1, thisUserID);
 			st2.executeUpdate();
-			closeDB();
+			// closeDB();
 			thisUserID = null;
 		}
 		catch(SQLException e1)
