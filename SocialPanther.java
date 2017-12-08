@@ -4,14 +4,29 @@
 
 import java.util.*;
 import java.sql.*;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 
 public class SocialPanther
 {
 	private static Database db;
 	private static boolean logged_in;
+	private static Scanner scanner;
+
 	public static void main(String args[]) throws SQLException
 	{
-		Scanner scan = new Scanner(System.in);
+		RunSocialPanther();
+	}
+
+
+
+	public static void RunSocialPanther() throws SQLException{
+		RunSocialPanther(System.in);
+	}
+
+	public static void RunSocialPanther(InputStream inputStream) throws SQLException{
+		scanner = new Scanner(inputStream);
+
 		if(!prompt_db_login()){
 			return;
 		}
@@ -23,7 +38,7 @@ public class SocialPanther
 			while(logged_in)
 			{
 				displayMenu();
-				String input = scan.nextLine();
+				String input = scanner.nextLine();
 
 				//Check the input for errors
 				if(input.equals("0"))
@@ -100,13 +115,12 @@ public class SocialPanther
 	//Prompt the user to enter the top K messaged users in the past x months
 	private static void topK() throws SQLException
 	{
-		Scanner scan = new Scanner(System.in);
 		try
 		{
 			System.out.println("Enter how many users do you want in your results:");
-			int k = scan.nextInt();
+			int k = scanner.nextInt();
 			System.out.println("Enter how many months in the past you want your results to go back:");
-			int x = scan.nextInt();
+			int x = scanner.nextInt();
 			db.topMessages(k, x);
 		}
 		catch(InputMismatchException e4)
@@ -118,11 +132,11 @@ public class SocialPanther
 	//Prompt the user to enter two userID's to find a path between
 	private static void search3DegPath() throws SQLException
 	{
-		Scanner scan = new Scanner(System.in);
+
 		System.out.println("Enter the first userID (the starting point):");
-		String userID1 = scan.nextLine();
+		String userID1 = scanner.nextLine();
 		System.out.println("Enter the second userID (the end point):");
-		String userID2 = scan.nextLine();
+		String userID2 = scanner.nextLine();
 
 		db.threeDegrees(userID1, userID2);
 	}
@@ -131,50 +145,45 @@ public class SocialPanther
 	private static void userSearch() throws SQLException
 	{
 		System.out.println("Enter the things you would like to search for:");
-		Scanner scan = new Scanner(System.in);
-		db.searchForUser(scan.nextLine());
+		db.searchForUser(scanner.nextLine());
 	}
 
 	//Ask the user which group to send the message to
 	private static void groupMessage() throws SQLException
 	{
 		System.out.println("Enter the group ID of the group you would like to send a message to:");
-		Scanner scan = new Scanner(System.in);
-		db.sendMessageToGroup(scan.nextLine());
+		db.sendMessageToGroup(scanner.nextLine());
 	}
 
 	//Ask the user who he/she would like to send a message to
 	private static void userMessage() throws SQLException
 	{
 		System.out.println("Enter the userID of the friend you would like to send a message to:");
-		Scanner scan  = new Scanner(System.in);
-		db.sendMessageToUser(scan.nextLine());
+		db.sendMessageToUser(scanner.nextLine());
 	}
 
 	//Prompt the user to enter the ID of a group to request
 	private static void groupRequest() throws SQLException
 	{
 		System.out.println("Enter the group ID of the group you would like to send a request to:");
-		Scanner scan = new Scanner(System.in);
-		db.initiateAddingGroup(scan.nextLine());
+
+		db.initiateAddingGroup(scanner.nextLine());
 	}
 
 	//Prompt a user to enter an ID for a friend request
 	private static void friendRequest() throws SQLException
 	{
 		System.out.println("Enter the userID of the friend you would like to send a request to:");
-		Scanner scan = new Scanner(System.in);
-		db.initiateFriendship(scan.nextLine());
+		db.initiateFriendship(scanner.nextLine());
 	}
 
 	//Prompt user for information regarding group creation and then create it
 	private static void groupCreation() throws SQLException
 	{
-		Scanner scan = new Scanner(System.in);
 		System.out.println("Enter the name of your group:");
-		String name = scan.nextLine();
+		String name = scanner.nextLine();
 		System.out.println("Enter a brief description of your group:");
-		String des = scan.nextLine();
+		String des = scanner.nextLine();
 		
 		//Check that the input is an integer
 		boolean valid = false;
@@ -184,7 +193,7 @@ public class SocialPanther
 			try
 			{
 				System.out.println("Enter the maximum number of members allowed in your group:");
-				limit = scan.nextInt();
+				limit = scanner.nextInt();
 				valid = true;
 			}
 			catch(InputMismatchException e1)
@@ -202,11 +211,10 @@ public class SocialPanther
 		System.out.println("Welcome to the SocialPanther social network!");
 		System.out.println("Enter your username login to Oracle: ");
 
-		Scanner scan = new Scanner(System.in);
-		String oUsername = scan.nextLine();
+		String oUsername = scanner.nextLine();
 
 		System.out.println("Enter your password to login to Oracle: ");
-		String oPass = scan.nextLine();
+		String oPass = scanner.nextLine();
 
 		db = new Database(oUsername, oPass);
 
@@ -217,22 +225,21 @@ public class SocialPanther
 	private static int prompt_login() throws SQLException
 	{
 		
-		Scanner scan = new Scanner(System.in);
 		//Prompt either login or new account creation
 		String input = null;
 		do{
 			System.out.println("Press 1 to login, 0 to create a new account or -1 to quit.");
-			input = scan.nextLine();
+			input = scanner.nextLine();
 		}while(!input.equals("1") && !input.equals("0") && !input.equals("-1"));
 
 		//Log in the user
 		if(input.equals("1"))
 		{
 			System.out.println("Enter your SocialPanther userID: ");
-			String username = scan.nextLine();
+			String username = scanner.nextLine();
 
 			System.out.println("Enter your SocialPanther password: ");
-			String pass = scan.nextLine();
+			String pass = scanner.nextLine();
 
 			logged_in = db.loginUser(username, pass);
 
@@ -242,10 +249,10 @@ public class SocialPanther
 				System.out.println("Username or password was incorrect.");
 
 				System.out.println("Enter your SocialPanther username: ");
-				username = scan.nextLine();
+				username = scanner.nextLine();
 
 				System.out.println("Enter your SocialPanther password: ");
-				pass = scan.nextLine();
+				pass = scanner.nextLine();
 
 				logged_in = db.loginUser(username, pass);
 			}
@@ -262,7 +269,6 @@ public class SocialPanther
 	//Note- error checks for date of birth are not working properly (infinite loop)
 	private static void prompt_createUser() throws SQLException
 	{
-		Scanner scan = new Scanner(System.in);
 		boolean success = false;
 		String userID;
 		String password;
@@ -273,7 +279,7 @@ public class SocialPanther
 			do
 			{
 				System.out.println("Enter your name: ");
-				name = scan.nextLine();
+				name = scanner.nextLine();
 			}while(name.length() > 20 || name.length() == 0);
 
 			//Get user's userID
@@ -281,7 +287,7 @@ public class SocialPanther
 			do
 			{
 				System.out.println("Enter your userID: ");
-				userID = scan.nextLine();
+				userID = scanner.nextLine();
 			}while(userID.length() > 20 || userID.length() == 0);
 
 			//Get user's email
@@ -289,7 +295,7 @@ public class SocialPanther
 			do
 			{
 				System.out.println("Enter your email: ");
-				email = scan.nextLine();
+				email = scanner.nextLine();
 			}while(email.length() > 20 || email.length() == 0);
 
 			//Get the user's password
@@ -297,7 +303,7 @@ public class SocialPanther
 			do
 			{
 				System.out.println("Enter your password: ");
-				password = scan.nextLine();
+				password = scanner.nextLine();
 			}while(password.length() > 20 || password.length() == 0);
 
 			//Get the user's date of birth
@@ -311,7 +317,7 @@ public class SocialPanther
 				try
 				{
 					System.out.println("Enter your month of birth as an integer:");
-					month = scan.nextInt();
+					month = scanner.nextInt();
 
 					//Do an error check on the month
 					if(month > 12 || month < 1)
@@ -324,7 +330,7 @@ public class SocialPanther
 				catch(InputMismatchException e1)
 				{
 					System.out.println("Invalid Input: Please enter an integer");
-					scan.next();
+					scanner.next();
 					continue;
 				}
 			}
@@ -337,7 +343,7 @@ public class SocialPanther
 				try
 				{
 					System.out.println("Enter your day of birth: ");
-					day = scan.nextInt();
+					day = scanner.nextInt();
 
 					//Do an error check on the day
 					if((month == 1 || month == 3 || month == 5 || month == 7 || month == 8 || month == 10 || month == 12) && (day < 1 || day > 31))
@@ -360,7 +366,7 @@ public class SocialPanther
 				catch(InputMismatchException e2)
 				{
 					System.out.println("Invalid Input: Please enter an integer");
-					scan.next();
+					scanner.next();
 					continue;
 				}
 			}
@@ -373,13 +379,13 @@ public class SocialPanther
 				try
 				{
 					System.out.println("Enter your year of birth:");
-					year = scan.nextInt();
+					year = scanner.nextInt();
 					valid = true;
 				}
 				catch(InputMismatchException e3)
 				{
 					System.out.println("Invalid Input: Please enter an integer");
-					scan.next();
+					scanner.next();
 					continue;
 				}
 			}
