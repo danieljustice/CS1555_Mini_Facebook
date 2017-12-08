@@ -12,60 +12,67 @@ public class SocialPanther
 	public static void main(String args[]) throws SQLException
 	{
 		Scanner scan = new Scanner(System.in);
-		prompt_login();
-		//Cycyle through the menu until the user logs out
-		while(logged_in)
-		{
-			displayMenu();
-			String input = scan.nextLine();
-
-			//Check the input for errors
-			if(input.equals("0"))
-			{
-				db.Logout();
-				logged_in = false;
-			}
-			else if(input.equals("1"))
-				db.displayFriends();
-			else if(input.equals("2"))
-				db.confirmFriendship();
-			else if(input.equals("3"))
-				groupCreation();
-			else if(input.equals("4"))
-				friendRequest();
-			else if(input.equals("5"))
-				groupRequest();
-			else if(input.equals("6"))
-				userMessage();
-			else if(input.equals("7"))
-				groupMessage();
-			else if(input.equals("8"))
-				db.displayMessages();
-			else if(input.equals("9"))
-				db.displayNewMessages();
-			else if(input.equals("10"))
-				userSearch();
-			else if(input.equals("11"))
-				search3DegPath();
-			else if(input.equals("12"))
-				topK();
-			else if(input.equals("13"))
-			{
-				System.out.println("SocialPanther is a social network pioneered by Daniel Justice and Jordan Carr.");
-				System.out.println("It was created during the Fall of 2017 for a Database class (CS1555) at the University of Pittsburgh.");
-				System.out.println("SocialPanther is run on Java with an Oracle based SQL database.");
-				System.out.println("Feel free to explore what SocialPanther has to offer!");
-			}
-			else if(input.equals("14"))
-			{
-				db.dropUser();
-				logged_in = false;
-				System.out.println("It's a shame to see you go. We hope you will join again in the future!");
-			}
-			else
-				System.out.println("Invalid Input\n");
+		if(!prompt_db_login()){
+			return;
 		}
 
+		while(prompt_login() != -1){
+
+			
+			//Cycyle through the menu until the user logs out
+			while(logged_in)
+			{
+				displayMenu();
+				String input = scan.nextLine();
+
+				//Check the input for errors
+				if(input.equals("0"))
+				{
+					db.Logout();
+					logged_in = false;
+				}
+				else if(input.equals("1"))
+					db.displayFriends();
+				else if(input.equals("2"))
+					db.confirmFriendship();
+				else if(input.equals("3"))
+					groupCreation();
+				else if(input.equals("4"))
+					friendRequest();
+				else if(input.equals("5"))
+					groupRequest();
+				else if(input.equals("6"))
+					userMessage();
+				else if(input.equals("7"))
+					groupMessage();
+				else if(input.equals("8"))
+					db.displayMessages();
+				else if(input.equals("9"))
+					db.displayNewMessages();
+				else if(input.equals("10"))
+					userSearch();
+				else if(input.equals("11"))
+					search3DegPath();
+				else if(input.equals("12"))
+					topK();
+				else if(input.equals("13"))
+				{
+					System.out.println("SocialPanther is a social network pioneered by Daniel Justice and Jordan Carr.");
+					System.out.println("It was created during the Fall of 2017 for a Database class (CS1555) at the University of Pittsburgh.");
+					System.out.println("SocialPanther is run on Java with an Oracle based SQL database.");
+					System.out.println("Feel free to explore what SocialPanther has to offer!");
+				}
+				else if(input.equals("14"))
+				{
+					db.dropUser();
+					logged_in = false;
+					System.out.println("It's a shame to see you go. We hope you will join again in the future!");
+				}
+				else
+					System.out.println("Invalid Input\n");
+			}
+		}
+		db.closeDB();
 		System.out.println("See you again soon!");
 	}
 
@@ -190,9 +197,7 @@ public class SocialPanther
 		db.createGroup(name, des, limit);
 	}
 
-	//Prompt the user to login
-	private static void prompt_login() throws SQLException
-	{
+	private static boolean prompt_db_login() throws SQLException{
 		//Prompt login to Oracle
 		System.out.println("Welcome to the SocialPanther social network!");
 		System.out.println("Enter your username login to Oracle: ");
@@ -205,12 +210,20 @@ public class SocialPanther
 
 		db = new Database(oUsername, oPass);
 
+		return db != null;
+	}
+
+	//Prompt the user to login
+	private static int prompt_login() throws SQLException
+	{
+		
+		Scanner scan = new Scanner(System.in);
 		//Prompt either login or new account creation
 		String input = null;
 		do{
-			System.out.println("Press 1 to login or 0 to create a new account.");
+			System.out.println("Press 1 to login, 0 to create a new account or -1 to quit.");
 			input = scan.nextLine();
-		}while(!input.equals("1") && !input.equals("0"));
+		}while(!input.equals("1") && !input.equals("0") && !input.equals("-1"));
 
 		//Log in the user
 		if(input.equals("1"))
@@ -237,11 +250,12 @@ public class SocialPanther
 				logged_in = db.loginUser(username, pass);
 			}
 		}
-		else
+		else if(input.equals("0"))
 		{
 			//Create a new user and automatically login the user
 			prompt_createUser();
 		}
+		return Integer.parseInt(input);
 	}
 
 	//Creates a new user and automatically logs the user in on this account
