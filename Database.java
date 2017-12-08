@@ -535,20 +535,40 @@ public class Database
 
 		try
 		{
-			PreparedStatement st1 = dbcon.prepareStatement("INSERT INTO messages values(?, ?, ?, ?, NULL, CURRENT_DATE)");
-			//Not sure how to determine message ID
-			PreparedStatement st2 = dbcon.prepareStatement("SELECT MAX(msgID) as max FROM messages");
-			ResultSet id = st2.executeQuery();
-			if(id.next())
-				st1.setInt(1, id.getInt("max") + 1);
-			else
-				st1.setInt(1, 1);
-			st1.setString(2, thisUserID);
-			st1.setString(3, msg);
-			st1.setString(4, toID);
-			st1.executeUpdate();
 
-			System.out.println("Sent successfully");
+			//First check if the user is friends
+			PreparedStatement st0 = dbcon.prepareStatement("SELECT userID1, userID2 FROM friends WHERE userID1 = ? or userID2 = ?");
+			st0.setString(1, thisUserID);
+			st0.setString(2, thisUserID);
+			ResultSet friends = st0.executeQuery();
+
+			boolean found = false;
+			while(friends.next()){
+				if(toID.equals(friends.getString("userID1")) || toID.equals(friends.getString("userID2")))
+				{
+					found = true;
+					break;
+				}
+			}
+
+			if(found){
+				PreparedStatement st1 = dbcon.prepareStatement("INSERT INTO messages values(?, ?, ?, ?, NULL, CURRENT_DATE)");
+				//Not sure how to determine message ID
+				PreparedStatement st2 = dbcon.prepareStatement("SELECT MAX(msgID) as max FROM messages");
+				ResultSet id = st2.executeQuery();
+				if(id.next())
+					st1.setInt(1, id.getInt("max") + 1);
+				else
+					st1.setInt(1, 1);
+				st1.setString(2, thisUserID);
+				st1.setString(3, msg);
+				st1.setString(4, toID);
+				st1.executeUpdate();
+
+				System.out.println("Sent successfully");
+			}else{
+				System.out.println("Unable to send message: not currently friends.");
+			}
 		}
 		catch(SQLException e1)
 		{
