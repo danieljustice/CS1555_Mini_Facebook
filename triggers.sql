@@ -205,16 +205,42 @@ END;
 --END;
 --/
 
---Delete a message where the recipient and userID have been deleted
---CREATE OR REPLACE TRIGGER DELETE_MESSAGE
---AFTER
---DELETE ON profile
---FOR EACH ROW
---BEGIN
-	--DELETE FROM messages
-	--WHERE toUserID is null and fromID is null;
---END;
---/
+-- Delete a message where the recipient and userID have been deleted
+CREATE OR REPLACE TRIGGER DELETE_MESSAGE
+AFTER
+DELETE ON profile
+BEGIN
+	DELETE FROM messages
+	-- WHERE toUserID is null and fromID is null and toGroupID is null;
+	where msgID in (SELECT msgID
+			FROM messages
+			WHERE fromID = NULL and toUserID = NULL and toGroupID = NULL);
+	-- DELETE_MESSAGES_ON_NULL_USERS(300);
+END;
+/
+
+-- CREATE OR REPLACE PROCEDURE DELETE_MESSAGES_ON_NULL_USERS(msg in number)
+-- AS
+-- WOOT number;
+-- BEGIN
+-- 	for i in (select * 
+-- 		FROM messages)LOOP
+-- 				dbms_output.put_line('I have '||i.cnt||' male friends.');
+-- 			-- if i.fromID = null then
+-- 			-- DELETE from messages where msgID = i.msgID;
+-- 		END LOOP;
+
+
+-- select msgID into WOOT from messages where msgID = msg;
+-- if msg = 5 then
+-- 	dbms_output.put_line ('msg is ' || WOOT);
+-- ELSE
+-- dbms_output.put_line ('balance is too low');
+-- end if;
+-- 	-- dbm_output.put_line('TEsting this.');
+-- END; 
+-- -- DELETE_MESSAGES_ON_NULL_USERS;
+-- /
 
 --Insert into message recipients group messages
 CREATE OR REPLACE TRIGGER ADD_GM_TO_RECIPIENTS
