@@ -10,7 +10,7 @@ if(server == '1'):
 
 
 # scps = []
-files = ["Database.java", "TestDriver.java", "SocialPanther.java", "initDB.sql", "profile.sql", "groups.sql", "friends.sql", "schemas.sql", "triggers.sql", "benchmarks/bench1.txt", "benchmarks/bench2.txt", "benchmarks/bench3.txt"]
+files = ["Database.java", "TestDriver.java", "SocialPanther.java", "initDB.sql", "profile.sql", "groups.sql", "friends.sql", "schemas.sql", "triggers.sql", "benchmarks/bench1.txt", "benchmarks/bench2.txt", "benchmarks/bench3.txt", "benchmarks/bench4.txt", "benchmarks/bench5.txt"]
 
 fileString = " ".join(files)
 scps = ("scp " + fileString + " " + server + ":" + filepath)
