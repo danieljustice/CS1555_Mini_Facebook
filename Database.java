@@ -531,7 +531,19 @@ public class Database
 		//Change so it can be multilined
 		Scanner scan = new Scanner(System.in);
 		System.out.println("Enter your message: ");
-		String msg = scan.nextLine();
+		// String msg = scan.nextLine();
+
+		String msg = "";
+		Scanner keyboard = new Scanner(System.in);
+		String line;
+		while (scan.hasNextLine()) {
+			line = scan.nextLine();
+			if (line.isEmpty()) {
+				break;
+			}
+			msg += line + "\n";
+		}
+
 
 		try
 		{
@@ -602,8 +614,19 @@ public class Database
 			//Ask for the message
 			Scanner scan = new Scanner(System.in);
 			System.out.println("Please enter your message to the group: ");
-			String msg = scan.nextLine();
+			// String msg = scan.nextLine();
 
+			String msg = "";
+			Scanner keyboard = new Scanner(System.in);
+			String line;
+			while (scan.hasNextLine()) {
+				line = scan.nextLine();
+				if (line.isEmpty()) {
+					break;
+				}
+				msg += line + "\n";
+			}
+			
 			//First check if the user is in the group
 			PreparedStatement st1 = dbcon.prepareStatement("SELECT gID FROM groupMembership WHERE userID = ?");
 			st1.setString(1, thisUserID);
