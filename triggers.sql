@@ -121,9 +121,9 @@ INSERT ON pendingGroupmembers
 FOR EACH ROW
 DECLARE qty number := 0;
 BEGIN
-	SELECT COUNT(*) INTO qty from groupMembership where userID = :new.userID and gID = :new.userID;
+	SELECT COUNT(*) INTO qty from groupMembership where userID = :new.userID and gID = :new.gID;
 	if qty > 0 then
-		raise_application_error(-20003, 'No a group member cannot be inserted into the pendingGroupmembers table.');
+		raise_application_error(-20003, 'A group member cannot be inserted into the pendingGroupmembers table.');
 	end if;
 END;
 /
