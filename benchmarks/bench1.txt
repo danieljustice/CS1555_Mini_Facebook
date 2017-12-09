@@ -5,13 +5,9 @@ Jordan
 jcc117
 jcc117@pitt.edu
 yoyo
-a
 8
-a
 8
-a
 1999
-slsls
 0
 1
 jcc117
