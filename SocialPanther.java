@@ -169,7 +169,7 @@ public class SocialPanther
 	{
 		System.out.println("Enter the group ID of the group you would like to send a request to:");
 
-		db.initiateAddingGroup(scanner.nextLine());
+		db.initiateAddingGroup(scanner.nextLine(), scanner);
 	}
 
 	//Prompt a user to enter an ID for a friend request

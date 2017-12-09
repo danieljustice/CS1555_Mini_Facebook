@@ -510,11 +510,17 @@ public class Database
 	/*Given a user and a group, create a pending request of adding to group (if not violate the
 	group's membership limit). The user should be prompted to enter a message to be sent along
 	with the request and inserted in the pendingGroupmembers relation.*/
+	
 	public void initiateAddingGroup(String gID)
+	{
+		initiateAddingGroup(gID, new Scanner(System.in));
+	}
+	
+	public void initiateAddingGroup(String gID, Scanner scan)
 	{
 		try
 		{
-			Scanner scan = new Scanner(System.in);
+			// Scanner scan = new Scanner(System.in);
 			System.out.println("Enter a message for your group request:");
 			String msg = scan.nextLine();
 
