@@ -118,23 +118,23 @@ public class Database
 	{
 		//Using method overload here to have a version of this method that
 		//can be easily tested
-		return initiateFriendship(thisUserID, toID, System.in);
+		return initiateFriendship(thisUserID, toID, new Scanner(System.in));
 	}
 
-	public boolean initiateFriendship(String toID, String message)
+	public boolean initiateFriendship(String toID, Scanner scan)
 	{
 		//Using method overload here to have a version of this method that
 		//can be easily tested
-		ByteArrayInputStream in  =  new ByteArrayInputStream(message.getBytes());
-		return initiateFriendship(thisUserID, toID, in);
+		// ByteArrayInputStream in  =  new ByteArrayInputStream(message.getBytes());
+		return initiateFriendship(thisUserID, toID, scan);
 	}
 
 	//Allows us to feed an inputstream into this method so that we can automate the tests
-	public boolean initiateFriendship(String fromID, String toID, InputStream in)
+	public boolean initiateFriendship(String fromID, String toID, Scanner scan)
 	{
 		//Get a message from the user
 		System.out.println("Sending a request to " + toID);
-		Scanner scan = new Scanner(in);
+		// Scanner scan = new Scanner(in);
 		System.out.println("Enter a message for your friendrequest:");
 		String msg = scan.nextLine();
 
@@ -181,8 +181,14 @@ public class Database
 			return false;
 		}
 	}
+
+
 	public void confirmFriendship(){
-		confirmFriendship(thisUserID, System.in);
+		confirmFriendship(thisUserID, new Scanner(System.in));
+	}
+
+	public void confirmFriendship(Scanner scan){
+		confirmFriendship(thisUserID, scan);
 	}
 	//This task should first display a formatted, numbered list of all outstanding friends and group
 	//requests with an associated messages. Then, the user should be prompted for a number of the
@@ -190,7 +196,7 @@ public class Database
 	//should move the request from the appropriate pendingFriends or pendingGroupmembers
 	//relation to the friends or groupMembership relation. The remaining requests which were not
 	//selected are declined and removed from pendingFriends and pendingGroupmembers relations.
-	public void confirmFriendship(String userID, InputStream in)
+	public void confirmFriendship(String userID, Scanner scan)
 	{
 		try
 		{
@@ -246,7 +252,7 @@ public class Database
 			}
 			
 			//Ask which requests to confirm
-			Scanner scan = new Scanner(in);
+			// Scanner scan = new Scanner(in);
 			String input = "";
 			Set<Integer> friendsToAdd = new HashSet<Integer>();
 			while(!input.contains("-1")){
@@ -332,13 +338,18 @@ public class Database
 
 	}
 
+	
 	/*This task supports the browsing of the user's friends and of their friends' profiles. It first
 	displays each of the user's friends' names and userIDs and those of any friend of those friends.
 	Then it allows the user to either retrieve a friend's entire profile by entering the appropriate
 	userID or exit browsing and return to the main menu by entering 0 as a userID. When selected,
 	a friend's profile should be displayed in a nicely formatted way, after which the user should be
 	prompted to either select to retrieve another friend's profile or return to the main menu.*/
-	public void displayFriends()
+	public void displayFriends(){
+		displayFriends(new Scanner(System.in));
+	}
+	
+	public void displayFriends(Scanner scan)
 	{
 		try
 		{
@@ -374,7 +385,7 @@ public class Database
 			}
 
 			//Menu to request profiles
-			Scanner scan = new Scanner(System.in);
+			// Scanner scan = new Scanner(System.in);
 			System.out.println("Enter a profileID to request a profile(enter 0 to exit):");
 			String input = scan.nextLine();
 

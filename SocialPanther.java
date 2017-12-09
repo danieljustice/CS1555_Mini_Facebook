@@ -49,9 +49,9 @@ public class SocialPanther
 					logged_in = false;
 				}
 				else if(input.equals("1"))
-					db.displayFriends();
+					db.displayFriends(scanner);
 				else if(input.equals("2"))
-					db.confirmFriendship();
+					db.confirmFriendship(scanner);
 				else if(input.equals("3"))
 					groupCreation();
 				else if(input.equals("4"))
@@ -177,9 +177,9 @@ public class SocialPanther
 	{
 		System.out.println("Enter the userID of the friend you would like to send a request to:");
 		if(gstream == System.in){
-			db.initiateFriendship(scanner.nextLine());
+			db.initiateFriendship(scanner.nextLine(), scanner);
 		}else{
-			db.initiateFriendship(scanner.nextLine(), scanner.nextLine());
+			db.initiateFriendship(scanner.nextLine(), scanner);
 		}
 		
 	}
