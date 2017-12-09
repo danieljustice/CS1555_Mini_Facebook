@@ -12,6 +12,7 @@ public class SocialPanther
 	private static Database db;
 	private static boolean logged_in;
 	private static Scanner scanner;
+	private static InputStream gstream;
 
 	public static void main(String args[]) throws SQLException
 	{
@@ -26,6 +27,7 @@ public class SocialPanther
 
 	public static void RunSocialPanther(InputStream inputStream) throws SQLException{
 		scanner = new Scanner(inputStream);
+		gstream = inputStream;
 
 		if(!prompt_db_login()){
 			return;
@@ -174,7 +176,12 @@ public class SocialPanther
 	private static void friendRequest() throws SQLException
 	{
 		System.out.println("Enter the userID of the friend you would like to send a request to:");
-		db.initiateFriendship(scanner.nextLine());
+		if(gstream == System.in){
+			db.initiateFriendship(scanner.nextLine());
+		}else{
+			db.initiateFriendship(scanner.nextLine(), scanner.nextLine());
+		}
+		
 	}
 
 	//Prompt user for information regarding group creation and then create it

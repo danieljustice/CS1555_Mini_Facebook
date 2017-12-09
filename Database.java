@@ -121,6 +121,14 @@ public class Database
 		return initiateFriendship(thisUserID, toID, System.in);
 	}
 
+	public boolean initiateFriendship(String toID, String message)
+	{
+		//Using method overload here to have a version of this method that
+		//can be easily tested
+		ByteArrayInputStream in  =  new ByteArrayInputStream(message.getBytes());
+		return initiateFriendship(thisUserID, toID, in);
+	}
+
 	//Allows us to feed an inputstream into this method so that we can automate the tests
 	public boolean initiateFriendship(String fromID, String toID, InputStream in)
 	{
