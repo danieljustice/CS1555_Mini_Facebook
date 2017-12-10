@@ -21,6 +21,7 @@ public class Database
 		DriverManager.registerDriver(new oracle.jdbc.driver.OracleDriver());
 		String url = "jdbc:oracle:thin:@class3.cs.pitt.edu:1521:dbclass";
 		dbcon = DriverManager.getConnection(url, username, password);
+		dbcon.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE);
 	}
 
 	//Implement the following functions

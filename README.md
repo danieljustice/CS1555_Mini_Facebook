@@ -31,7 +31,8 @@ Along with valid input, the benchmarks also include invalid input to test that t
 invalid data.
 
 Please run the benchmarks in the order presented below: the first file creates the inital user that logs in for each 
-subsequent test.
+subsequent test. All tests can be run at once with the test.sh shell script. HOWEVER, please be sure to run ttest.sql
+in sqlplus first in order to set up the databases.
 
 Also, be sure to insert all of our datafiles to ensure everything works properly.
 
@@ -51,3 +52,8 @@ sendMessageToUser, displayMessages, topMessages, displayNewMessages
 
 bench5.txt
 threeDegrees, searchForUser, dropUser
+
+BENCHMARK TESTING INSTRUCTIONS
+1.	Go to sqlplus and run the ttest.sql file
+2.	Go into the benchmarks folder and insert your own sql username and password into the files to run the app on your own profile	
+3. 	Run test.sh: this should compile all java files and run the benchmarks
