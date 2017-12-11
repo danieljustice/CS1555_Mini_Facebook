@@ -23,7 +23,7 @@ yoyo
 7
 11
 Hi new group
-\n
+
 0
 1
 1
@@ -36,7 +36,7 @@ yoyo
 7
 5
 Should fail
-\n
+
 0
 -1
 
