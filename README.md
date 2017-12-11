@@ -74,3 +74,4 @@ BENCHMARK TESTING INSTRUCTIONS
 	These are the first two lines of the files and currenly contain fillers for you to use.
 3. 	Run test.sh: this should compile all java files and run the benchmarks
 4.	After every run through of the benchmarks please remember to reset ttest.sql.
+
