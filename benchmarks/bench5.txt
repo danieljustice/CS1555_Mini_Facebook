@@ -1,5 +1,5 @@
-jcc117
-3918861
+<username>
+<password>
 1
 jcc117
 yoyo
@@ -26,6 +26,7 @@ woot
 10
 Dan A
 14
+-1
 -1
 
 

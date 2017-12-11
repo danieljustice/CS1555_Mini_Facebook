@@ -214,7 +214,7 @@ BEGIN
 	-- WHERE toUserID is null and fromID is null and toGroupID is null;
 	where msgID in (SELECT msgID
 			FROM messages
-			WHERE fromID = NULL and toUserID = NULL and toGroupID = NULL);
+			WHERE fromID is NULL and toUserID is NULL and toGroupID is NULL);
 	-- DELETE_MESSAGES_ON_NULL_USERS(300);
 END;
 /
