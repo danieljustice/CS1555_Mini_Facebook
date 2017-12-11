@@ -1,5 +1,5 @@
-jcc117
-3918861
+<username>
+<password>
 1
 jcc117
 yoyo
@@ -29,6 +29,14 @@ Hi new group
 1
 Password 3
 9
+0
+1
+jcc117
+yoyo
+7
+5
+Should fail
+
 0
 -1
 
